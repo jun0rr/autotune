@@ -22,22 +22,22 @@ public class TestAutotune {
   
   //@Test 
   public void testTakeMouseActivity() {
-    List<MouseEvent> evts = auto.takeMouseActivity();
-    System.out.printf("* Events: %d%n", evts.size());
-    evts.forEach(e->System.out.printf("    - %s%n", e));
+    //List<MouseEvent> evts = auto.takeMouseActivity();
+    //System.out.printf("* Events: %d%n", evts.size());
+    //evts.forEach(e->System.out.printf("    - %s%n", e));
   }
   
   //@Test 
   public void testTakeMouseClick() {
-    List<Point> evts = auto.takeMouseClick();
-    System.out.printf("* Points: %d%n", evts.size());
-    evts.forEach(e->System.out.printf("    - %s%n", e));
+    //List<Point> evts = auto.takeMouseClick();
+    //System.out.printf("* Points: %d%n", evts.size());
+    //evts.forEach(e->System.out.printf("    - %s%n", e));
   }
   
   //@Test 
   public void testTakeMouseDrag() {
-    Rectangle drag = auto.takeMouseDrag();
-    System.out.printf("* Mouse Drag: %s%n", drag);
+    //Rectangle drag = auto.takeMouseDrag();
+    //System.out.printf("* Mouse Drag: %s%n", drag);
   }
   
   @Test 
