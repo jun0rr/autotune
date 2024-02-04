@@ -4,12 +4,15 @@
  */
 package br.com.bb.autotune;
 
+import br.com.bb.autotune.settings.DialogSettings;
+import br.com.bb.autotune.settings.Settings;
 import java.awt.AWTException;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.util.List;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -24,10 +27,13 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import jiconfont.icons.font_awesome.FontAwesome;
+import jiconfont.swing.IconFontSwing;
 
 /**
  *
@@ -35,87 +41,113 @@ import javax.swing.JPopupMenu;
  */
 public class EditablePanel extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
   
-  private final BufferedImage background;
+  private final Autotune auto;
   
-  private Font font;
+  private final Settings settings;
   
-  private Color fontColor;
+  private final DialogSettings dialogsets;
   
   private final List<TextPoint> textPoints;
+  
+  private final List<Consumer<Autotune>> actions;
+  
+  private final JPopupMenu popup;
+  
+  private BufferedImage background;
   
   private TextPoint current;
   
   private Rectangle rect;
   
-  private int delay;
-  
   private KeyEvent oldKeyEvent;
   
   private KeyEvent prevKeyEvent;
   
-  private final JPopupMenu popup;
-  
-  private final Autotune auto;
-  
-  private final List<Consumer<Autotune>> actions;
-  
-  public EditablePanel(Autotune a) {
+  public EditablePanel(JFrame owner, Autotune a) {
     this.auto = Objects.requireNonNull(a);
     this.actions = new LinkedList<>();
+    this.textPoints = new LinkedList();
     this.popup = createPopupMenu();
+    this.settings = new Settings();
+    this.dialogsets = new DialogSettings(owner, settings);
     try {
       Robot r = new Robot();
       this.background = r.createScreenCapture(new Rectangle(
           Toolkit.getDefaultToolkit().getScreenSize())
       );
-      this.font = new Font("Consolas", Font.BOLD, 18);
-      this.fontColor = Color.BLACK;
-      this.textPoints = new LinkedList();
-      this.addMouseListener(this);
-      this.addKeyListener(this);
-      this.addMouseMotionListener(this);
     }
     catch(AWTException e) {
       throw new RuntimeException(e);
     }
+    this.addMouseListener(this);
+    this.addKeyListener(this);
+    this.addMouseMotionListener(this);
   }
   
   private JPopupMenu createPopupMenu() {
+    IconFontSwing.register(FontAwesome.getIconFont());
     JPopupMenu menu = new JPopupMenu();
-    JMenu actions = new JMenu("<Actions>");
+    JMenu file = new JMenu("File");
+    file.setIcon(IconFontSwing.buildIcon(FontAwesome.FILE_O, 12f));
+    JMenuItem iopensts = new JMenuItem("Load Settings");
+    iopensts.setIcon(IconFontSwing.buildIcon(FontAwesome.FOLDER_OPEN_O, 12f));
+    JMenuItem iopenimg = new JMenuItem("Load Image");
+    iopenimg.setIcon(IconFontSwing.buildIcon(FontAwesome.FOLDER_OPEN_O, 12f));
+    JMenuItem isavests = new JMenuItem("Save Settings");
+    isavests.setIcon(IconFontSwing.buildIcon(FontAwesome.FLOPPY_O, 12f));
+    JMenuItem isaveimg = new JMenuItem("Save Image");
+    isaveimg.setIcon(IconFontSwing.buildIcon(FontAwesome.FILE_IMAGE_O, 12f));
+    file.add(iopensts);
+    file.add(iopenimg);
+    file.add(new JPopupMenu.Separator());
+    file.add(isavests);
+    file.add(isaveimg);
+    
     JMenuItem isets = new JMenuItem("Settings");
-    JMenuItem ifont = new JMenuItem("Font");
-    JMenuItem icolor = new JMenuItem("Color");
-    JMenuItem idelay = new JMenuItem("Autodelay");
-    JMenuItem iexec = new JMenuItem("Execute");
+    isets.setIcon(IconFontSwing.buildIcon(FontAwesome.COG, 12f));
+    isets.addActionListener(e->{
+      dialogsets.showDialog();
+      System.out.printf("* DialogSets Size: %s%n", dialogsets.getSize());
+    });
     JMenuItem iupdate = new JMenuItem("Update");
+    iupdate.setIcon(IconFontSwing.buildIcon(FontAwesome.REFRESH, 12f));
+    //JCheckBoxMenuItem irec = new JCheckBoxMenuItem("Record", IconFontSwing.buildIcon(FontAwesome.CIRCLE, 12f, Color.RED));
+    JMenuItem irec = new JMenuItem("Record");
+    irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f, Color.BLACK));
+    irec.addActionListener(e->{
+      settings.setRecord(!settings.isRecord());
+      if(settings.isRecord()) {
+        irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE, 12f, Color.RED));
+      }
+      else {
+        irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f, Color.BLACK));
+      }
+      irec.repaint();
+    });
+    JMenuItem iplay = new JMenuItem("Play");
+    iplay.setIcon(IconFontSwing.buildIcon(FontAwesome.PLAY_CIRCLE, 12f));
     JMenuItem iexit = new JMenuItem("Exit");
+    iexit.setIcon(IconFontSwing.buildIcon(FontAwesome.SIGN_OUT, 12f));
+    iexit.addActionListener(e->System.exit(0));
+    
+    menu.add(file);
+    menu.add(isets);
+    menu.add(iupdate);
+    menu.add(irec);
+    menu.add(iplay);
+    menu.add(new JPopupMenu.Separator());
+    menu.add(iexit);
     return menu;
   }
   
-  @Override
-  public void setFont(Font f) {
-    this.font = f;
-    if(current != null) {
-      current.setFont(f);
-    }
-  }
-  
-  public void setFontColor(Color c) {
-    this.fontColor = c;
-    if(current != null) {
-      current.setColor(c);
-    }
-  }
-  
-  public void setAutoDelay(int ms) {
-    this.delay = ms;
+  public Settings settings() {
+    return settings;
   }
   
   @Override
   public void paint(Graphics g) {
     super.paint(g);
-    //g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
+    g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
     if(!textPoints.isEmpty()) {
       textPoints.forEach(t->{
         //Graphics gg = g.create();
@@ -128,20 +160,30 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     if(rect != null) {
       Graphics2D gg = (Graphics2D) g;
       gg.setStroke(new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{5f}, 0));
-      gg.setColor(Color.blue);
+      gg.setColor(settings.getCurrentColor().color());
       gg.draw(rect);
     }
+  }
+  
+  private void addAction(Consumer<Autotune> c) {
+    if(settings.isRecord()) actions.add(c);
   }
   
   @Override
   public void mouseClicked(MouseEvent e) {
     System.out.printf("* mouseClicked( %s )%n", e);
     if(MouseEvent.BUTTON1 == e.getButton()) {
-      current = new TextPoint(e.getPoint(), font,  fontColor);
+      current = new TextPoint(e.getPoint(), settings.getFont(), settings.getCurrentColor().color());
       textPoints.add(current);
     }
     else if(MouseEvent.BUTTON3 == e.getButton()) {
-      rect = null;
+      if(e.isControlDown()) {
+        popup.show(this, e.getX(), e.getY());
+      }
+      else {
+        rect = null;
+        repaint();
+      }
     }
   }
 
@@ -165,20 +207,20 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   private void keydo(KeyEvent e) {
     switch(e.getExtendedKeyCode()) {
       case 0x2f:
-        actions.add(Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'));
+        addAction(Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'));
         break;
       case 0x10000c7:
-        actions.add(Autotune.CHAR_MAP.get(e.isShiftDown() ? 'Ç' : 'ç'));
+        addAction(Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'));
         break;
       default:
-        actions.add(a->a.keydo(e));
+        addAction(a->a.keydo(e));
         break;
     }
   }
   
   private int mod(KeyEvent e) {
     int mod = 1;
-    if(e.isShiftDown()) {
+    if(e.isShiftDown() || Character.isUpperCase(e.getKeyChar())) {
       mod *= 16;
     }
     if(e.isControlDown()) {
@@ -270,8 +312,14 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     repaint();
   }
   
-  @Override public void mouseMoved(MouseEvent e) {
-    actions.add(a->a.mouseMove(e.getPoint()));
+  @Override 
+  public void mouseMoved(MouseEvent e) {
+    addAction(a->a.mouseMove(e.getPoint()));
+  }
+
+  @Override
+  public String toString() {
+    return "EditablePanel{" + "settings=" + settings + ", textPoints=" + textPoints + ", actions=" + actions + ", current=" + current + ", rect=" + rect + '}';
   }
   
 }
