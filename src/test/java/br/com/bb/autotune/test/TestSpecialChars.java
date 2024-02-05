@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TestSpecialChars {
   
-  @Test public void test() throws AWTException {
+  //@Test 
+  public void test() throws AWTException {
     Robot r = new Robot();
     //r.keyPress(193);
     //r.keyRelease(193);

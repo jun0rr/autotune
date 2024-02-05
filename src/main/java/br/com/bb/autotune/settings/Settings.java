@@ -64,7 +64,7 @@ public class Settings {
   
   private Font font;
   
-  private DrawMode draw;
+  private DrawSettings draw;
   
   private int delay;
   
@@ -99,7 +99,7 @@ public class Settings {
     colors.add(DARK_GRAY);
     colors.add(BLACK);
     colors.add(WHITE);
-    this.draw = new DrawMode(this);
+    this.draw = new DrawSettings(this);
     this.listeners = new LinkedList<>();
   }
   
@@ -167,7 +167,7 @@ public class Settings {
     return this;
   }
   
-  public DrawMode getDrawMode() {
+  public DrawSettings getDrawSettings() {
     return draw;
   }
   

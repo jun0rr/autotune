@@ -19,7 +19,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TestJTextFieldBackground {
   
-  @Test public void test() throws Exception {
+  @Test 
+  public void test() throws Exception {
     try {
       Autotune auto = new Autotune();
       JFrame f = new JFrame();

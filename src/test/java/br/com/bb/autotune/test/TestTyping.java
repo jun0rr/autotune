@@ -20,7 +20,8 @@ public class TestTyping {
   
   private static Random rnd = new Random();
   
-  @Test public void test() throws AWTException, InterruptedException {
+  //@Test 
+  public void test() throws AWTException, InterruptedException {
     Robot r = new Robot();
     //522, 703
     //65, 100

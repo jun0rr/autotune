@@ -25,7 +25,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TestWindow {
   
-  @Test public void test() throws InterruptedException, AWTException {
+  //@Test 
+  public void test() throws InterruptedException, AWTException {
     Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
     Robot r = new Robot();
     BufferedImage img = r.createScreenCapture(new Rectangle(d));

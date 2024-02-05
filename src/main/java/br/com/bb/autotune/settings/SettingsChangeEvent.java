@@ -12,7 +12,7 @@ public enum SettingsChangeEvent {
   
   COLOR,
   FONT,
-  DRAW_SHAPE,
+  DRAW_MODE,
   DRAW_THICKNESS,
   DRAW_FILL,
   DELAY,

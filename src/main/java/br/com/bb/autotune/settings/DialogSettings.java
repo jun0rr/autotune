@@ -5,6 +5,7 @@
 package br.com.bb.autotune.settings;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
@@ -15,7 +16,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.IOException;
@@ -24,11 +24,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -45,6 +46,18 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   
   public static final String ICON_PATH = "/gear.png";
   
+  public static final Object[] SHAPE_OPTIONS = {
+    new JLabel("None", IconFontSwing.buildIcon(FontAwesome.BAN, 12f), SwingConstants.LEFT),
+    new JLabel("Rectange", IconFontSwing.buildIcon(FontAwesome.SQUARE_O, 12f), SwingConstants.LEFT),
+    new JLabel("Triangle", IconFontSwing.buildIcon(FontAwesome.CARET_UP, 14f), SwingConstants.LEFT),
+    new JLabel("Circle", IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Up", IconFontSwing.buildIcon(FontAwesome.ARROW_UP, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Right", IconFontSwing.buildIcon(FontAwesome.ARROW_RIGHT, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Down", IconFontSwing.buildIcon(FontAwesome.ARROW_DOWN, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Left", IconFontSwing.buildIcon(FontAwesome.ARROW_LEFT, 12f), SwingConstants.LEFT),
+    new JLabel("Free", IconFontSwing.buildIcon(FontAwesome.PENCIL, 12f), SwingConstants.LEFT),
+  };
+  
   private final Settings settings;
   
   private final Frame owner;
@@ -59,6 +72,8 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   
   private final JTextField currentColor;
   
+  private final JComboBox shapeCombo;
+  
   private final List<ColorDisplay> lastColors;
   
   public DialogSettings(Frame owner, Settings ps) {
@@ -70,6 +85,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     this.fontSizeModel = new SpinnerNumberModel(settings.getFont().getSize(), 1, 60, 1);
     this.fontSize = new JSpinner(fontSizeModel);
     this.currentColor = new JTextField(settings.getCurrentColor().colorHex());
+    this.shapeCombo = new JComboBox(SHAPE_OPTIONS);
     this.lastColors = new ArrayList<>(4);
     try {
       Image icon = ImageIO.read(getClass().getResourceAsStream(ICON_PATH));
@@ -101,15 +117,50 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   
   @Override
   public void accept(SettingsChangeEvent e) {
-    if(SettingsChangeEvent.COLOR == e) {
-      List<ColorInfo> next4 = settings.next4colors();
-      currentColor.setText(next4.get(0).colorHex());
-      for(int i = 0; i < lastColors.size(); i++) {
-        ColorInfo ci = next4.get(i);
-        lastColors.get(i).setColorInfo(ci);
-      }
+    switch(e) {
+      case COLOR:
+        List<ColorInfo> next4 = settings.next4colors();
+        currentColor.setText(next4.get(0).colorHex());
+        for(int i = 0; i < lastColors.size(); i++) {
+          ColorInfo ci = next4.get(i);
+          lastColors.get(i).setColorInfo(ci);
+        }
+        break;
+      case DRAW_MODE:
+        switch(settings.getDrawSettings().getDrawMode()) {
+          case ARROW_DOWN:
+            shapeCombo.setSelectedIndex(6);
+            break;
+          case ARROW_LEFT:
+            shapeCombo.setSelectedIndex(7);
+            break;
+          case ARROW_RIGHT:
+            shapeCombo.setSelectedIndex(5);
+            break;
+          case ARROW_UP:
+            shapeCombo.setSelectedIndex(4);
+            break;
+          case CIRCLE:
+            shapeCombo.setSelectedIndex(3);
+            break;
+          case FREE:
+            shapeCombo.setSelectedIndex(8);
+            break;
+          case RECTANGLE:
+            shapeCombo.setSelectedIndex(1);
+            break;
+          case TRIANGLE:
+            shapeCombo.setSelectedIndex(2);
+            break;
+          default:
+            shapeCombo.setSelectedIndex(0);
+            break;
+        }
+        break;
+      default:
+        break;
     }
-    repaint();
+    if(isVisible()) repaint();
   }
   
   private void populate() {
@@ -195,11 +246,6 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
       fontFamily.repaint();
       DialogSettings.this.repaint();
     });
-    //fontstyle.addMouseMotionListener(new MouseMotionAdapter() {
-      //public void mouseMoved(MouseEvent e) {
-        //dsets.repaint();
-      //}
-    //});
     c = new GridBagConstraints();
     c.gridx = 2;
     c.gridy = 1;
@@ -357,52 +403,56 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     c.insets = new Insets(10, 10, 5, 10);
     add(lshape, c);
     
-    JComboBox jshape = new JComboBox(new Object[]{"Free", "Circle", "Rectangle", "Triangle"});
-    jshape.setPreferredSize(new Dimension(100, 25));
-    if(settings.getDrawMode().isCircleMode()) {
-      jshape.setSelectedIndex(1);
-    }
-    else if(settings.getDrawMode().isRectangleMode()) {
-      jshape.setSelectedIndex(2);
-    }
-    else if(settings.getDrawMode().isTriangleMode()) {
-      jshape.setSelectedIndex(3);
-    }
-    else {
-      jshape.setSelectedIndex(0);
-    }
-    jshape.addActionListener(e->{
-      settings.getDrawMode().setFreeMode(false);
-      settings.getDrawMode().setCircleMode(false);
-      settings.getDrawMode().setRectangleMode(false);
-      settings.getDrawMode().setCircleMode(false);
-      switch(jshape.getSelectedIndex()) {
+    shapeCombo.setPreferredSize(new Dimension(100, 25));
+    shapeCombo.setRenderer(new DefaultListCellRenderer() {
+      @Override
+      public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+        JLabel label = (JLabel)value;
+        this.setText(label.getText());
+        this.setIcon(label.getIcon());
+        return this;
+      }
+    });
+    shapeCombo.setSelectedIndex(0);
+    shapeCombo.addActionListener(e->{
+      switch(shapeCombo.getSelectedIndex()) {
         case 1:
-          settings.getDrawMode().setCircleMode(true);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.RECTANGLE);
           break;
         case 2:
-          settings.getDrawMode().setRectangleMode(true);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.TRIANGLE);
           break;
         case 3:
-          settings.getDrawMode().setTriangleMode(true);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.CIRCLE);
+          break;
+        case 4:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_UP);
+          break;
+        case 5:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_RIGHT);
+          break;
+        case 6:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_DOWN);
+          break;
+        case 7:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_LEFT);
+          break;
+        case 8:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.FREE);
           break;
         default:
-          settings.getDrawMode().setFreeMode(true);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.NONE);
           break;
       }
     });
-    //jshape.addMouseMotionListener(new MouseMotionAdapter() {
-      //public void mouseMoved(MouseEvent e) {
-        //dsets.repaint();
-      //}
-    //});
     c = new GridBagConstraints();
     c.gridx = 1;
     c.gridy = 7;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
     c.insets = new Insets(0, 10, 10, 10);
-    add(jshape, c);
+    add(shapeCombo, c);
     
     JLabel lthick = new JLabel("Thickness");
     lthick.setFont(labelfont);
@@ -414,16 +464,11 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     c.insets = new Insets(10, 10, 5, 10);
     add(lthick, c);
     
-    SpinnerNumberModel model = new SpinnerNumberModel(settings.getDrawMode().getThickness(), 1, 10, 1);
+    SpinnerNumberModel model = new SpinnerNumberModel(settings.getDrawSettings().getThickness(), 1, 10, 1);
     JSpinner jthick = new JSpinner(model);
-    jthick.addChangeListener(e->settings.getDrawMode()
+    jthick.addChangeListener(e->settings.getDrawSettings()
         .setThickness(model.getNumber().intValue())
     );
-    //jthick.addMouseMotionListener(new MouseMotionAdapter() {
-      //public void mouseMoved(MouseEvent e) {
-        //dsets.repaint();
-      //}
-    //});
     jthick.setPreferredSize(new Dimension(80, 25));
     c = new GridBagConstraints();
     c.gridx = 2;
@@ -445,7 +490,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     
     JCheckBox jfill = new JCheckBox("Fill");
     jfill.addActionListener(e->{
-      settings.getDrawMode().setFillMode(jfill.isSelected());
+      settings.getDrawSettings().setFillEnabled(jfill.isSelected());
       System.out.println(settings);
     });
     c = new GridBagConstraints();

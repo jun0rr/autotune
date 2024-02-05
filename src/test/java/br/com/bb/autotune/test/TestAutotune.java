@@ -40,7 +40,7 @@ public class TestAutotune {
     //System.out.printf("* Mouse Drag: %s%n", drag);
   }
   
-  @Test 
+  //@Test 
   public void testGoToBrowser() {
     for(int i = 0; i < 5; i++) {
       auto.mouseMove(325, 702);

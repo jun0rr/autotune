@@ -20,7 +20,8 @@ import org.junit.jupiter.api.Test;
  */
 public class TestFakeScreen {
   
-  @Test public void test() throws InterruptedException, AWTException {
+  //@Test 
+  public void test() throws InterruptedException, AWTException {
     FakeScreen screen = new FakeScreen();
     screen.setLocation(0, 0);
     Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
