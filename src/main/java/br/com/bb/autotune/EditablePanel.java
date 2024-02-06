@@ -6,6 +6,7 @@ package br.com.bb.autotune;
 
 import br.com.bb.autotune.settings.DialogSettings;
 import br.com.bb.autotune.settings.DrawSettings;
+import br.com.bb.autotune.settings.DrawSettings.DrawMode;
 import br.com.bb.autotune.settings.Settings;
 import br.com.bb.autotune.settings.SettingsChangeEvent;
 import java.awt.AWTException;
@@ -13,6 +14,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
 import java.util.List;
 import java.awt.Rectangle;
 import java.awt.Robot;
@@ -116,7 +119,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   }
   
   private void toggleDrawItem() {
-    if(DrawSettings.DrawMode.NONE != settings.getDrawSettings().getDrawMode()) {
+    if(settings.getDrawSettings().isDrawModeEnabled()) {
       drawItem.setText("Select");
       drawItem.setIcon(IconFontSwing.buildIcon(FontAwesome.EXTERNAL_LINK, 12f));
     }
@@ -127,7 +130,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   }
   
   private void toggleDrawSettings() {
-    if(DrawSettings.DrawMode.NONE != settings.getDrawSettings().getDrawMode()) {
+    if(settings.getDrawSettings().isDrawModeEnabled()) {
       settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.NONE);
       //drawItem.setText("Draw");
       //drawItem.setIcon(IconFontSwing.buildIcon(FontAwesome.PAINT_BRUSH, 12f, Settings.GREEN_DARKEN3.color()));
@@ -170,7 +173,6 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     
     JMenuItem iupdate = new JMenuItem("Update");
     iupdate.setIcon(IconFontSwing.buildIcon(FontAwesome.REFRESH, 12f));
-    //JCheckBoxMenuItem irec = new JCheckBoxMenuItem("Record", IconFontSwing.buildIcon(FontAwesome.CIRCLE, 12f, Color.RED));
     JMenuItem irec = new JMenuItem("Record");
     irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f, Color.BLACK));
     irec.addActionListener(e->{
@@ -224,7 +226,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
         gg.draw(s.getShape());
       }
     });
-    if(DrawSettings.DrawMode.NONE != settings.getDrawSettings().getDrawMode() && currentShape != null) {
+    if(settings.getDrawSettings().isDrawModeEnabled() && currentShape != null) {
       Graphics2D gg = (Graphics2D) g;
       gg.setStroke(currentShape.getStroke());
       gg.setColor(currentShape.getColor());
@@ -332,7 +334,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
             .collect(Collectors.toList())
             .forEach(textPoints::remove);
         shapes.stream()
-            .filter(s->select.contains(s.getShape().getBounds().getLocation()))
+            .filter(s->select.contains(s.getPoint()))
             .collect(Collectors.toList())
             .forEach(shapes::remove);
       }
@@ -394,23 +396,47 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   public void mouseDragged(MouseEvent e) {
     int x = e.getPoint().x;
     int y = e.getPoint().y;
-    if(DrawSettings.DrawMode.NONE != settings.getDrawSettings().getDrawMode()) {
+    if(settings.getDrawSettings().isDrawModeEnabled()) {
       if(currentShape == null) {
-        currentShape = new ShapeInfo(settings.getDrawSettings()
-            .getShape(x, y, 1, 1),
+        currentShape = new ShapeInfo(e.getPoint(),
+            settings.getDrawSettings().getShape(x, y, 0, 0),
             settings.getDrawSettings().getStroke(),
             settings.getCurrentColor().color(),
             settings.getDrawSettings().isFillEnabled()
         );
       }
+      else if(DrawMode.LINE == settings.getDrawSettings().getDrawMode()) {
+        Polygon p = new Polygon();
+        p.addPoint(currentShape.getPoint().x, currentShape.getPoint().y);
+        p.addPoint(x, y);
+        currentShape = new ShapeInfo(currentShape.getPoint(), p,
+            settings.getDrawSettings().getStroke(), 
+            settings.getCurrentColor().color(), false
+        );
+      }
+      else if(DrawMode.FREE == settings.getDrawSettings().getDrawMode()) {
+        Polygon p = new Polygon();
+        p.addPoint(currentShape.getPoint().x, currentShape.getPoint().y);
+        p.addPoint(x, y);
+        shapes.add(new ShapeInfo(currentShape.getPoint(), p,
+            settings.getDrawSettings().getStroke(), 
+            settings.getCurrentColor().color(), false
+        ));
+        p = new Polygon();
+        p.addPoint(x, y);
+        currentShape = new ShapeInfo(e.getPoint(), p,
+            settings.getDrawSettings().getStroke(), 
+            settings.getCurrentColor().color(), false
+        );
+      }
       else {
-        Rectangle bounds = currentShape.getShape().getBounds();
-        int sx = Math.min(x, select.x);
-        int sy = Math.min(y, select.y);
-        int sw = Math.max(select.x + select.width - x, x - select.x);
-        int sh = Math.max(select.y + select.height - y, y - select.y);
-        currentShape = new ShapeInfo(settings.getDrawSettings()
-            .getShape(sx, sy, sw, sh),
+        Point before = currentShape.getPoint();
+        int sx = Math.min(x, before.x);
+        int sy = Math.min(y, before.y);
+        int sw = Math.max(x, before.x) - sx;
+        int sh = Math.max(y, before.y) - sy;
+        currentShape = new ShapeInfo(before,
+            settings.getDrawSettings().getShape(sx, sy, sw, sh),
             settings.getDrawSettings().getStroke(),
             settings.getCurrentColor().color(),
             settings.getDrawSettings().isFillEnabled()
@@ -426,7 +452,6 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
         int sy = Math.min(y, select.y);
         int sw = Math.max(select.x + select.width - x, x - select.x);
         int sh = Math.max(select.y + select.height - y, y - select.y);
-        //System.out.printf("* select( x=%d, y=%d, w=%d, h=%d )%n", sx, sy, sw, sh);
         select = new Rectangle(sx, sy, sw, sh);
       }
     }

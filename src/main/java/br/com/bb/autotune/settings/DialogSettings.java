@@ -48,6 +48,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   
   public static final Object[] SHAPE_OPTIONS = {
     new JLabel("None", IconFontSwing.buildIcon(FontAwesome.BAN, 12f), SwingConstants.LEFT),
+    new JLabel("Line", IconFontSwing.buildIcon(FontAwesome.MINUS, 12f), SwingConstants.LEFT),
     new JLabel("Rectange", IconFontSwing.buildIcon(FontAwesome.SQUARE_O, 12f), SwingConstants.LEFT),
     new JLabel("Triangle", IconFontSwing.buildIcon(FontAwesome.CARET_UP, 14f), SwingConstants.LEFT),
     new JLabel("Circle", IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f), SwingConstants.LEFT),
@@ -129,28 +130,31 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
       case DRAW_MODE:
         switch(settings.getDrawSettings().getDrawMode()) {
           case ARROW_DOWN:
-            shapeCombo.setSelectedIndex(6);
-            break;
-          case ARROW_LEFT:
             shapeCombo.setSelectedIndex(7);
             break;
-          case ARROW_RIGHT:
-            shapeCombo.setSelectedIndex(5);
-            break;
-          case ARROW_UP:
-            shapeCombo.setSelectedIndex(4);
-            break;
-          case CIRCLE:
-            shapeCombo.setSelectedIndex(3);
-            break;
-          case FREE:
+          case ARROW_LEFT:
             shapeCombo.setSelectedIndex(8);
             break;
-          case RECTANGLE:
+          case ARROW_RIGHT:
+            shapeCombo.setSelectedIndex(6);
+            break;
+          case ARROW_UP:
+            shapeCombo.setSelectedIndex(5);
+            break;
+          case CIRCLE:
+            shapeCombo.setSelectedIndex(4);
+            break;
+          case FREE:
+            shapeCombo.setSelectedIndex(9);
+            break;
+          case LINE:
             shapeCombo.setSelectedIndex(1);
             break;
-          case TRIANGLE:
+          case RECTANGLE:
             shapeCombo.setSelectedIndex(2);
+            break;
+          case TRIANGLE:
+            shapeCombo.setSelectedIndex(3);
             break;
           default:
             shapeCombo.setSelectedIndex(0);
@@ -418,27 +422,30 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     shapeCombo.addActionListener(e->{
       switch(shapeCombo.getSelectedIndex()) {
         case 1:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.RECTANGLE);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.LINE);
           break;
         case 2:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.TRIANGLE);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.RECTANGLE);
           break;
         case 3:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.CIRCLE);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.TRIANGLE);
           break;
         case 4:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_UP);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.CIRCLE);
           break;
         case 5:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_RIGHT);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_UP);
           break;
         case 6:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_DOWN);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_RIGHT);
           break;
         case 7:
-          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_LEFT);
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_DOWN);
           break;
         case 8:
+          settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.ARROW_LEFT);
+          break;
+        case 9:
           settings.getDrawSettings().setDrawMode(DrawSettings.DrawMode.FREE);
           break;
         default:

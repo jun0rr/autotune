@@ -4,7 +4,9 @@
  */
 package br.com.bb.autotune;
 
+import br.com.bb.autotune.settings.Settings;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.util.Objects;
@@ -15,6 +17,8 @@ import java.util.Objects;
  */
 public class ShapeInfo {
   
+  private final Point point;
+  
   private final Shape shape;
   
   private final Stroke stroke;
@@ -23,11 +27,16 @@ public class ShapeInfo {
   
   private final boolean fill;
   
-  public ShapeInfo(Shape shape, Stroke stroke, Color color, boolean fill) {
+  public ShapeInfo(Point p, Shape shape, Stroke stroke, Color color, boolean fill) {
+    this.point = p;
     this.shape = shape;
     this.stroke = stroke;
     this.color = color;
     this.fill = fill;
+  }
+
+  public Point getPoint() {
+    return point;
   }
 
   public Stroke getStroke() {
@@ -49,6 +58,7 @@ public class ShapeInfo {
   @Override
   public int hashCode() {
     int hash = 5;
+    hash = 47 * hash + Objects.hashCode(this.point);
     hash = 47 * hash + Objects.hashCode(this.stroke);
     hash = 47 * hash + Objects.hashCode(this.color);
     hash = 47 * hash + Objects.hashCode(this.shape);
@@ -68,6 +78,9 @@ public class ShapeInfo {
       return false;
     }
     final ShapeInfo other = (ShapeInfo) obj;
+    if (!Objects.equals(this.point, other.point)) {
+      return false;
+    }
     if (!Objects.equals(this.stroke, other.stroke)) {
       return false;
     }
@@ -79,7 +92,7 @@ public class ShapeInfo {
 
   @Override
   public String toString() {
-    return "ShapePoint{shape=" + shape + ", stroke=" + stroke + ", color=" + color + ", fill=" + fill + '}';
+    return "ShapePoint{point=" + point + ", shape=" + shape + ", stroke=" + stroke + ", color=" + color + ", fill=" + fill + '}';
   }
   
 }
