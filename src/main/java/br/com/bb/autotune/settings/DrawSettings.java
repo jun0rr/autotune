@@ -4,15 +4,8 @@
  */
 package br.com.bb.autotune.settings;
 
-import br.com.bb.autotune.ShapeInfo;
 import java.awt.BasicStroke;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.Objects;
 
 /**
@@ -22,7 +15,16 @@ import java.util.Objects;
 public class DrawSettings {
   
   public static enum DrawMode { 
-    NONE, FREE, LINE, RECTANGLE, TRIANGLE, CIRCLE, ARROW_UP, ARROW_RIGHT, ARROW_DOWN, ARROW_LEFT
+    NONE, 
+    LINE, 
+    RECTANGLE, 
+    TRIANGLE, 
+    CIRCLE, 
+    ARROW_UP, 
+    ARROW_RIGHT, 
+    ARROW_DOWN, 
+    ARROW_LEFT,
+    FREE
   }
   
   private final Settings settings;
@@ -46,10 +48,6 @@ public class DrawSettings {
   
   public boolean isDrawModeEnabled() {
     return DrawMode.NONE != mode;
-  }
-  
-  public boolean isFreeModeEnabled() {
-    return DrawMode.FREE == mode;
   }
   
   public DrawMode getDrawMode() {
@@ -80,83 +78,6 @@ public class DrawSettings {
     this.thickness = thickness;
     settings.fireEvent(SettingsChangeEvent.DRAW_THICKNESS);
     return this;
-  }
-  
-  public Shape getShape(int x, int y, int w, int h) {
-    System.out.printf("* getShape( %d, %d, %d, %d )%n", x, y, w, h);
-    switch(mode) {
-      case ARROW_DOWN:
-        Polygon a = new Polygon();
-        a.addPoint(x + w/4, y);
-        a.addPoint(x + w/4, y + h/2);
-        a.addPoint(x, y + h/2);
-        a.addPoint(x + w/2, y + h);
-        a.addPoint(x + w, y + h/2);
-        a.addPoint(x + w/4*3, y + h/2);
-        a.addPoint(x + w/4*3, y);
-        return a;
-      case ARROW_LEFT:
-        Polygon b = new Polygon();
-        b.addPoint(x, y + h/2);
-        b.addPoint(x + w/2, y);
-        b.addPoint(x + w/2, y + h/4);
-        b.addPoint(x + w, y + h/4);
-        b.addPoint(x + w, y + h/4*3);
-        b.addPoint(x + w/2, y + h/4*3);
-        b.addPoint(x + w/2, y + h);
-        return b;
-      case ARROW_RIGHT:
-        Polygon c = new Polygon();
-        c.addPoint(x, y + h/4);
-        c.addPoint(x + w/2, y + h/4);
-        c.addPoint(x + w/2, y);
-        c.addPoint(x + w, y + h/2);
-        c.addPoint(x + w/2, y + h);
-        c.addPoint(x + w/2, y + h/4*3);
-        c.addPoint(x, y + h/4*3);
-        return c;
-      case ARROW_UP:
-        Polygon d = new Polygon();
-        d.addPoint(x + w/2, y);
-        d.addPoint(x + w, y + h/2);
-        d.addPoint(x + w/4*3, y + h/2);
-        d.addPoint(x + w/4*3, y + h);
-        d.addPoint(x + w/4, y + h);
-        d.addPoint(x + w/4, y + h/2);
-        d.addPoint(x, y + h/2);
-        return d;
-      case CIRCLE:
-        return new Ellipse2D.Float(
-            Integer.valueOf(x).floatValue(),
-            Integer.valueOf(y).floatValue(),
-            Integer.valueOf(w).floatValue(),
-            Integer.valueOf(h).floatValue()
-        );
-      case FREE:
-         return new Ellipse2D.Float(
-            Integer.valueOf(x).floatValue(),
-            Integer.valueOf(y).floatValue(),
-            Integer.valueOf(thickness).floatValue(),
-            Integer.valueOf(thickness).floatValue()
-        );
-      case LINE:
-        return new Line2D.Float(
-            Integer.valueOf(x).floatValue(),
-            Integer.valueOf(y).floatValue(),
-            Integer.valueOf(x + w).floatValue(),
-            Integer.valueOf(y + h).floatValue()
-        );
-      case RECTANGLE:
-        return new Rectangle(x, y, w, h);
-      case TRIANGLE:
-        Polygon p = new Polygon();
-        p.addPoint(x + w/2, y);
-        p.addPoint(x + w, y + h);
-        p.addPoint(x, y + h);
-        return p;
-      default:
-        return null;
-    }
   }
   
   public Stroke getStroke() {

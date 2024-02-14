@@ -51,7 +51,7 @@ public class ShapeInfo {
     return shape;
   }
 
-  public boolean isFill() {
+  public boolean isFillEnabled() {
     return fill;
   }
   

@@ -175,23 +175,6 @@ public class Autotune {
     return this;
   }
   
-  public Autotune mousedo(MouseEvent e) {
-    switch(e.getID()) {
-      case MouseEvent.MOUSE_MOVED:
-        mouseMove(e.getPoint());
-        break;
-      case MouseEvent.MOUSE_PRESSED:
-        mousePress(e.getButton());
-        break;
-      case MouseEvent.MOUSE_RELEASED:
-        mouseRelease(e.getButton());
-        break;
-      default:
-        break;
-    }
-    return this;
-  }
-  
   public Autotune keydo(KeyEvent e) {
     switch(e.getID()) {
       case KeyEvent.KEY_PRESSED:
