@@ -5,7 +5,10 @@
 package br.com.bb.autotune.action;
 
 import br.com.bb.autotune.EditablePanel;
+import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 /**
  *
@@ -14,29 +17,37 @@ import java.awt.event.KeyEvent;
 public class ShowPopupMenuAction extends AbstractPanelAction {
   
   public ShowPopupMenuAction() {
-    super("ShowPopupMenu");
+    super("ShowPopupMenuAction");
   }
   
   @Override
   public boolean accept(EditablePanel p) {
-    return KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isControlDown();
+    return p.getLastKeyEvents()[0] != null
+        && KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && p.getLastKeyEvents()[0].isControlDown()
+        || (p.getLastMouseEvents()[0] != null
+        && MouseEvent.MOUSE_CLICKED == p.getLastMouseEvents()[0].getID() 
+        && MouseEvent.BUTTON3 == p.getLastMouseEvents()[0].getButton()
+        && p.getLastMouseEvents()[0].isControlDown());
   }
   
   @Override
   public void perform(EditablePanel p) {
-    p.getOwner().setVisible(false);
-    p.getAutotune().delay(100);
-    p.getRecordActions().stream()
-        .skip(p.getActionIndex().get())
-        .peek(a->p.getActionIndex().incrementAndGet())
-        .peek(a->p.getAutotune().delay(10))
-        .forEach(a->a.perform(p));
-    p.getAutotune().delay(100);
-    p.getBackgroundImage().set(
-        p.getAutotune().takeScreenshot()
-    );
-    p.getOwner().setVisible(true);
+    Point xy;
+    if(p.getLastMouseEvents()[0] != null
+        && MouseEvent.BUTTON3 == p.getLastMouseEvents()[0].getButton()
+        && p.getLastMouseEvents()[0].isControlDown()) {
+      xy = p.getLastMouseEvents()[0].getPoint();
+    }
+    else {
+      Point loc = p.getLocationOnScreen();
+      Dimension dim = p.getSize();
+      xy = new Point(loc.x + dim.width / 2, loc.y + dim.height / 2);
+    }
+    if(p.getSettings().isRecord()) {
+      p.getRecordActions().remove(p.getRecordActions().size() -1);
+    }
+    p.getPopupMenu().show(p, xy.x, xy.y);
   }
   
 }

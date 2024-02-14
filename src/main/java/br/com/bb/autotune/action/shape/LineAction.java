@@ -4,16 +4,11 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.Reference;
+import br.com.bb.autotune.EditablePanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
-import br.com.bb.autotune.settings.Settings;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
-import java.util.List;
 
 /**
  *
@@ -21,24 +16,24 @@ import java.util.List;
  */
 public class LineAction extends AbstractShapeAction {
 
-  public LineAction(Settings s) {
-    super(s);
+  public LineAction() {
+    super("Line");
   }
   
   @Override
-  public boolean accept() {
-    return DrawMode.LINE == settings.getDrawSettings().getDrawMode();
+  public boolean accept(EditablePanel p) {
+    return DrawMode.LINE == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(MouseEvent e, Reference<ShapeInfo> current, List<ShapeInfo> shapes) {
-    Point origin = getOrigin(e, current);
-    Polygon p = new Polygon();
-    p.addPoint(origin.x, origin.y);
-    p.addPoint(e.getPoint().x, e.getPoint().y);
-    current.set(new ShapeInfo(origin, p,
-        settings.getDrawSettings().getStroke(), 
-        settings.getCurrentColor().color(), false
+  public void perform(EditablePanel p) {
+    Point origin = getOrigin(p.getLastMouseEvents()[0], p.getCurrentShape());
+    Polygon po = new Polygon();
+    po.addPoint(origin.x, origin.y);
+    po.addPoint(p.getLastMouseEvents()[0].getPoint().x, p.getLastMouseEvents()[0].getPoint().y);
+    p.getCurrentShape().set(new ShapeInfo(origin, po,
+        p.getSettings().getDrawSettings().getStroke(), 
+        p.getSettings().getCurrentColor().color(), false
     ));
   }
   

@@ -5,25 +5,32 @@
 package br.com.bb.autotune.action.text;
 
 import br.com.bb.autotune.Autotune;
-import br.com.bb.autotune.TextPoint;
-import java.awt.event.KeyEvent;
+import br.com.bb.autotune.EditablePanel;
 
 /**
  *
  * @author Juno
  */
-public class CircumflexAction implements TextAction {
-
-  @Override
-  public boolean accept(KeyEvent[] e) {
-    return e[2] != null && e[2].getExtendedKeyCode() == 131 && e[1].getExtendedKeyCode() == 16;
+public class CircumflexAction extends AbstractTextAction {
+  
+  public CircumflexAction() {
+    super("CircumflexAction");
   }
 
   @Override
-  public void perform(KeyEvent[] e, TextPoint t) {
-    int code = (mod(e[2]) * e[2].getExtendedKeyCode() -1) * mod(e[0]) * e[0].getExtendedKeyCode();
+  public boolean accept(EditablePanel p) {
+    return p.getCurrentText().isPresent() 
+        && p.getLastKeyEvents()[2] != null 
+        && p.getLastKeyEvents()[2].getExtendedKeyCode() == 131 
+        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16;
+  }
+
+  @Override
+  public void perform(EditablePanel p) {
+    int code = (mod(p.getLastKeyEvents()[2]) * p.getLastKeyEvents()[2].getExtendedKeyCode() -1) 
+        * mod(p.getLastKeyEvents()[0]) * p.getLastKeyEvents()[0].getExtendedKeyCode();
     if(Autotune.KEYCODES_MAP.containsKey(code)) {
-      t.text().append(Autotune.KEYCODES_MAP.get(code));
+      p.getCurrentText().get().text().append(Autotune.KEYCODES_MAP.get(code));
     }
   }
   

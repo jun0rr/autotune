@@ -26,7 +26,8 @@ public class SaveImageAction extends AbstractPanelAction {
   
   @Override
   public boolean accept(EditablePanel p) {
-    return KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+    return p.getLastKeyEvents()[0] != null
+        && KeyEvent.VK_F3 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isControlDown();
   }
   

@@ -4,8 +4,16 @@
  */
 package br.com.bb.autotune;
 
+import br.com.bb.autotune.action.CancelSelectionAction;
+import br.com.bb.autotune.action.DefaultRecordAction;
+import br.com.bb.autotune.action.DeleteSelectionAction;
+import br.com.bb.autotune.action.FinishShapeDrawAction;
 import br.com.bb.autotune.action.PanelAction;
-import br.com.bb.autotune.action.shape.AbstractShapeAction;
+import br.com.bb.autotune.action.RecordAction;
+import br.com.bb.autotune.action.SaveImageAction;
+import br.com.bb.autotune.action.SetCurrentTextAction;
+import br.com.bb.autotune.action.ShowPopupMenuAction;
+import br.com.bb.autotune.action.UpdateAction;
 import br.com.bb.autotune.action.shape.ArrowDownAction;
 import br.com.bb.autotune.action.shape.ArrowLeftAction;
 import br.com.bb.autotune.action.shape.ArrowRightAction;
@@ -23,7 +31,7 @@ import br.com.bb.autotune.action.text.CrasisAction;
 import br.com.bb.autotune.action.text.EnterAction;
 import br.com.bb.autotune.action.text.CharacterAction;
 import br.com.bb.autotune.action.text.TabAction;
-import br.com.bb.autotune.action.text.TextAction;
+import br.com.bb.autotune.action.text.AbstractTextAction;
 import br.com.bb.autotune.action.text.TildeAction;
 import br.com.bb.autotune.settings.DialogSettings;
 import br.com.bb.autotune.settings.DrawSettings;
@@ -48,21 +56,15 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import jiconfont.icons.font_awesome.FontAwesome;
@@ -86,7 +88,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   
   private final List<ShapeInfo> shapes;
   
-  private final List<PanelAction> recordActions;
+  private final List<RecordAction> recordActions;
   
   private final List<PanelAction> panelActions;
   
@@ -108,19 +110,21 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   
   private final MouseEvent[] mouseEvents;
   
-  private final List<TextAction> textActions;
+  private final List<AbstractTextAction> textActions;
   
-  private final List<AbstractShapeAction> shapeActions;
+  private final List<PanelAction> shapeActions;
   
   private final Dimension screenSize;
+  
+  private final SaveImageAction saveImageAction;
+  
+  private final UpdateAction updateAction;
   
   private float xmod, ymod;
   
   public EditablePanel(JFrame owner, Autotune a) {
     this.auto = Objects.requireNonNull(a);
     this.owner = Objects.requireNonNull(owner);
-    this.recordActions = new LinkedList<>();
-    this.panelActions = new LinkedList<>();
     this.textPoints = new LinkedList();
     this.shapes = new LinkedList();
     this.drawItem = new JMenuItem("Draw");
@@ -134,6 +138,17 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     this.actionIndex = new AtomicInteger(0);
     this.keyEvents = new KeyEvent[3];
     this.mouseEvents = new MouseEvent[3];
+    this.recordActions = new LinkedList<>();
+    this.panelActions = new LinkedList<>();
+    this.panelActions.add(new CancelSelectionAction());
+    this.panelActions.add(new DeleteSelectionAction());
+    this.panelActions.add(new FinishShapeDrawAction());
+    this.saveImageAction = new SaveImageAction();
+    this.panelActions.add(saveImageAction);
+    this.panelActions.add(new SetCurrentTextAction());
+    this.panelActions.add(new ShowPopupMenuAction());
+    this.updateAction = new UpdateAction();
+    this.panelActions.add(updateAction);
     this.textActions = new ArrayList<>();
     this.textActions.add(new EnterAction());
     this.textActions.add(new TabAction());
@@ -144,16 +159,16 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     this.textActions.add(new CircumflexAction());
     this.textActions.add(new CharacterAction());
     this.shapeActions = new ArrayList<>();
-    this.shapeActions.add(new ArrowDownAction(settings));
-    this.shapeActions.add(new ArrowLeftAction(settings));
-    this.shapeActions.add(new ArrowRightAction(settings));
-    this.shapeActions.add(new ArrowUpAction(settings));
-    this.shapeActions.add(new CircleAction(settings));
-    this.shapeActions.add(new FreeDrawAction(settings));
-    this.shapeActions.add(new LineAction(settings));
-    this.shapeActions.add(new RectangleAction(settings));
-    this.shapeActions.add(new TriangleAction(settings));
-    this.shapeActions.add(new RectangleSelectionAction(settings));
+    this.shapeActions.add(new ArrowDownAction());
+    this.shapeActions.add(new ArrowLeftAction());
+    this.shapeActions.add(new ArrowRightAction());
+    this.shapeActions.add(new ArrowUpAction());
+    this.shapeActions.add(new CircleAction());
+    this.shapeActions.add(new FreeDrawAction());
+    this.shapeActions.add(new LineAction());
+    this.shapeActions.add(new RectangleAction());
+    this.shapeActions.add(new TriangleAction());
+    this.shapeActions.add(new RectangleSelectionAction());
     try {
       Robot r = new Robot();
       this.screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -228,15 +243,15 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     return panelActions;
   }
   
-  public List<PanelAction> getRecordActions() {
+  public List<RecordAction> getRecordActions() {
     return recordActions;
   }
   
-  public List<TextAction> getTextActions() {
+  public List<AbstractTextAction> getTextActions() {
     return textActions;
   }
 
-  public List<AbstractShapeAction> getShapeActions() {
+  public List<PanelAction> getShapeActions() {
     return shapeActions;
   }
 
@@ -244,52 +259,19 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     return screenSize;
   }
   
-  public EditablePanel addRecordAction(PanelAction a) {
-    if(settings.isRecord()) recordActions.add(a);
+  public EditablePanel addRecordAction(String name, Consumer<Autotune> c) {
+    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(name, c));
+    return this;
+  }
+  
+  public EditablePanel addRecordAction(Consumer<Autotune> c, String fmt, Object...args) {
+    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, fmt, args));
     return this;
   }
   
   public EditablePanel addPanelAction(PanelAction a) {
     panelActions.add(a);
     return this;
-  }
-  
-  public void saveImage() {
-    JFileChooser chooser = new JFileChooser();
-    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    chooser.setMultiSelectionEnabled(false);
-    int opt = chooser.showSaveDialog(EditablePanel.this);
-    if(JFileChooser.APPROVE_OPTION == opt) {
-      File f = chooser.getSelectedFile();
-      try {
-        BufferedImage img = new BufferedImage(background.get().getWidth(), background.get().getHeight(), background.get().getType());
-        EditablePanel.this.paint(img.getGraphics());
-        String message = "Image saved successfully!";
-        if(selection.isPresent()) {
-          message = "Image selection saved successfully!";
-          Rectangle r = selection.get().getShape().getBounds();
-          img = img.getSubimage(r.x, r.y, r.width, r.height);
-        }
-        ImageIO.write(img, "jpg", f);
-        JOptionPane.showMessageDialog(EditablePanel.this, message, "Success", JOptionPane.INFORMATION_MESSAGE);
-      }
-      catch(IOException e) {
-        JOptionPane.showMessageDialog(EditablePanel.this, e, "Error", JOptionPane.ERROR_MESSAGE);
-      }
-    }
-  }
-  
-  public void update() {
-    owner.setVisible(false);
-    auto.delay(100);
-    actions.stream()
-        .skip(actionIndex.get())
-        .peek(c->actionIndex.incrementAndGet())
-        .peek(c->auto.delay(10))
-        .forEach(c->c.accept(auto));
-    auto.delay(100);
-    background.set(auto.takeScreenshot());
-    owner.setVisible(true);
   }
   
   public void accept(SettingsChangeEvent e) {
@@ -343,20 +325,23 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     actionsMenu.setIcon(IconFontSwing.buildIcon(FontAwesome.BULLSEYE, 12f));
     JMenuItem icopy = new JMenuItem("Copy Screenshot");
     icopy.setIcon(IconFontSwing.buildIcon(FontAwesome.CLONE, 12f));
-    icopy.addActionListener(e->addAction(a->a.copyScreenshot()));
+    icopy.addActionListener(e->addRecordAction("copyScreenshot", a->a.copyScreenshot()));
     JMenuItem idelay = new JMenuItem("Delay");
     idelay.setIcon(IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 12f));
-    idelay.addActionListener(e->addAction(a->a.delay(settings.getAutoDelay())));
+    idelay.addActionListener(e->addRecordAction(
+        a->a.delay(settings.getAutoDelay()), 
+        "delay( %d )", settings.getAutoDelay())
+    );
     JMenuItem itype = new JMenuItem("Type Clipboard");
     itype.setIcon(IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 12f));
-    itype.addActionListener(e->addAction(a->a.typeClipboard()));
+    itype.addActionListener(e->addRecordAction("typeClipboard", a->a.typeClipboard()));
     actionsMenu.add(icopy);
     actionsMenu.add(idelay);
     actionsMenu.add(itype);
     
     JMenuItem isaveimg = new JMenuItem("Save Image");
     isaveimg.setIcon(IconFontSwing.buildIcon(FontAwesome.FLOPPY_O, 12f));
-    isaveimg.addActionListener(a->saveImage());
+    isaveimg.addActionListener(a->saveImageAction.perform(this));
     
     JMenuItem isets = new JMenuItem("Settings");
     isets.setIcon(IconFontSwing.buildIcon(FontAwesome.COG, 12f));
@@ -393,7 +378,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     
     JMenuItem iupdate = new JMenuItem("Update");
     iupdate.setIcon(IconFontSwing.buildIcon(FontAwesome.REFRESH, 12f));
-    iupdate.addActionListener(e->update());
+    iupdate.addActionListener(e->updateAction.perform(this));
     
     JMenuItem irev = new JMenuItem("Rewind");
     irev.setIcon(IconFontSwing.buildIcon(FontAwesome.ANGLE_DOUBLE_LEFT, 12f));
@@ -403,7 +388,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     iplay.setIcon(IconFontSwing.buildIcon(FontAwesome.PLAY_CIRCLE, 12f));
     iplay.addActionListener(e->{
       actionIndex.set(0);
-      update();
+      updateAction.perform(this);
     });
     
     JMenuItem iexit = new JMenuItem("Exit");
@@ -457,6 +442,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
       }
     }
     else if(selection.isPresent()) {
+      System.out.printf("* selection.isPresent(): %s%n", selection);
       Graphics2D gg = (Graphics2D) g;
       gg.setStroke(selection.get().getStroke());
       gg.setColor(settings.getCurrentColor().color());
@@ -473,77 +459,63 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     mouseEvents[0]  = e;
   }
   
+  private void addKeyEvent(KeyEvent e) {
+    keyEvents[2] = keyEvents[1];
+    keyEvents[1] = keyEvents[0];
+    keyEvents[0] = e;
+  }
+  
   @Override
   public void mouseClicked(MouseEvent e) {
     addMouseEvent(e);
-    if(MouseEvent.BUTTON1 == e.getButton()) {
-      currentText.set(new TextPoint(e.getPoint(), settings.getFont(), settings.getCurrentColor().color()));
-      textPoints.add(currentText.get());
-    }
-    else if(MouseEvent.BUTTON3 == e.getButton()) {
-      if(e.isControlDown()) {
-        if(settings.isRecord()) {
-          actions.remove(actions.size() -1);
-        }
-        popupMenu.show(this, e.getX(), e.getY());
-      }
-      else {
-        selection.set(null);
-        repaint();
-      }
-    }
+    addKeyEvent(null);
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
   }
 
   @Override
   public void mousePressed(MouseEvent e) {
-    //System.out.printf("* mousePressed( %s )%n", e);
     addMouseEvent(e);
+    addKeyEvent(null);
     mousedo(e);
-    if(MouseEvent.BUTTON1 == e.getButton()) {
-      selection.set(null);
-    }
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
   }
 
   @Override public void mouseReleased(MouseEvent e) {
-    //System.out.printf("* mouseReleased( %s )%n", e);
     addMouseEvent(e);
-    if(currentShape.isPresent()) {
-      shapes.add(currentShape.get());
-      currentShape.set(null);
-    }
-    else {
-      mousedo(e);
-    }
+    addKeyEvent(null);
+    mousedo(e);
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
   }
 
-  @Override public void mouseEntered(MouseEvent e) {}
-
-  @Override public void mouseExited(MouseEvent e) {}
-
-  @Override public void keyTyped(KeyEvent e) {}
-  
   private Point modPoint(Point p) {
     return new Point(Math.round(p.x * xmod), Math.round(p.y * ymod));
   }
   
   private void mousedo(MouseEvent e) {
     if(e.isControlDown()) return;
+    Point mod = modPoint(e.getPoint());
     switch(e.getID()) {
       //case MouseEvent.MOUSE_MOVED:
         //System.out.printf(">> action: mouseMove( %s )%n", modPoint(e.getPoint()));
         //addAction(a->a.mouseMove(modPoint(e.getPoint())));
         //break;
       case MouseEvent.MOUSE_PRESSED:
-        System.out.printf(">> action: mouseMove( %s )%n", modPoint(e.getPoint()));
-        addAction(a->a.mouseMove(modPoint(e.getPoint())));
+        System.out.printf(">> action: mouseMove( %s )%n", mod);
+        addRecordAction(a->a.mouseMove(mod), "mouseMove( %d, %d )", mod.x, mod.y);
         System.out.printf(">> action: mousePress( %d )%n", e.getButton());
-        addAction(a->a.mousePress(e.getButton()));
+        addRecordAction(a->a.mousePress(e.getButton()),  "mousePress( %d )", e.getButton());
         break;
       case MouseEvent.MOUSE_RELEASED:
-        System.out.printf(">> action: mouseMove( %s )%n", modPoint(e.getPoint()));
-        addAction(a->a.mouseMove(modPoint(e.getPoint())));
+        System.out.printf(">> action: mouseMove( %s )%n", mod);
+        addRecordAction(a->a.mouseMove(mod), "mouseMove( %d, %d )", mod.x, mod.y);
         System.out.printf(">> action: mouseRelease( %d )%n", e.getButton());
-        addAction(a->a.mouseRelease(e.getButton()));
+        addRecordAction(a->a.mouseRelease(e.getButton()),  "mouseRelease( %d )", e.getButton());
         break;
       default:
         break;
@@ -554,11 +526,11 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     switch(e.getExtendedKeyCode()) {
       case 0x2f:
         System.out.printf(">> action: keydo( /? )%n");
-        addAction(Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'));
+        addRecordAction("keyType( ?/ )", Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'));
         break;
       case 0x10000c7:
         System.out.printf(">> action: keydo( ç )%n");
-        addAction(Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'));
+        addRecordAction("keyType( çÇ )", Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'));
         break;
       default:
         if(KeyEvent.KEY_PRESSED == e.getID()) {
@@ -567,91 +539,66 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
         else {
           System.out.printf(">> action: keyRelease( %s=%d )%n", e.getKeyChar(), e.getExtendedKeyCode());
         }
-        addAction(a->a.keydo(e));
+        addRecordAction(a->a.keydo(e), "keyType( %s=%d )", e.getKeyChar(), e.getExtendedKeyCode());
         break;
     }
   }
   
   @Override 
   public void keyPressed(KeyEvent e) {
+    addKeyEvent(e);
+    addMouseEvent(null);
     keydo(e);
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
   }
   
   @Override
   public void keyReleased(KeyEvent e) {
-    keyEvents[0] = e;
-    //System.out.printf("* keyReleased( %s )%n", e);
-    if(KeyEvent.VK_DELETE == e.getKeyCode() && e.isControlDown()) {
-      if(settings.isRecord()) {
-        actions.remove(actions.size() -1);
-      }
-      if(selection.isPresent()) {
-        textPoints.stream()
-            .filter(t->selection.get().getShape().contains(t.getPoint()))
-            .collect(Collectors.toList())
-            .forEach(textPoints::remove);
-        shapes.stream()
-            .filter(s->selection.get().getShape().contains(s.getPoint()))
-            .collect(Collectors.toList())
-            .forEach(shapes::remove);
-      }
-      else {
-        textPoints.clear();
-        shapes.clear();
-      }
-      if(!textPoints.contains(currentText.get())){
-        currentText.set(null);
-      }
-      selection.set(null);
-    }
-    else if(KeyEvent.VK_F1 == e.getKeyCode() && e.isControlDown()) {
-      if(settings.isRecord()) {
-        actions.remove(actions.size() -1);
-      }
-      update();
-    }
-    else {
-      keydo(e);
-      if(currentText.isPresent()) {
-        textActions.stream()
-            .filter(a->a.accept(keyEvents))
-            .findFirst()
-            .ifPresent(a->a.perform(keyEvents, currentText.get()));
-      }
-    }
-    keyEvents[2] = keyEvents[1];
-    keyEvents[1] = keyEvents[0];
+    addKeyEvent(e);
+    addMouseEvent(null);
+    keydo(e);
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
+    textActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
     repaint();
   }
 
   @Override
   public void mouseDragged(MouseEvent e) {
     addMouseEvent(e);
+    addKeyEvent(null);
+    panelActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
     shapeActions.stream()
-        .filter(AbstractShapeAction::accept)
-        .findFirst()
-        .ifPresent(a->a.perform(e, 
-            settings.getDrawSettings().isDrawModeEnabled() 
-                ? currentShape : selection, shapes)
-        );
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
     repaint();
   }
   
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
     System.out.printf(">> action: mouseWheel( %d )%n", e.getWheelRotation());
-    addRecordAction(a->a.mouseWheel(e.getWheelRotation()));
+    addRecordAction(a->a.mouseWheel(e.getWheelRotation()), "mouseWheel( %d )", e.getWheelRotation());
+    addKeyEvent(null);
   }
   
-  @Override 
-  public void mouseMoved(MouseEvent e) {
-    //System.out.printf(">> action: mouseMove( %s )%n", modPoint(e.getPoint()));
-    //addAction(a->a.mouseMove(e.getPoint()));
-  }
+  @Override public void mouseMoved(MouseEvent e) {}
 
+  @Override public void mouseEntered(MouseEvent e) {}
+
+  @Override public void mouseExited(MouseEvent e) {}
+
+  @Override public void keyTyped(KeyEvent e) {}
+  
   @Override
   public String toString() {
-    return "EditablePanel{" + "settings=" + settings + ", textPoints=" + textPoints + ", actions=" + actions + ", current=" + currentText + ", selection=" + selection + '}';
+    return "EditablePanel{" + "settings=" + settings + ", textPoints=" + textPoints + ", recordActions=" + recordActions + ", currentText=" + currentText + ", currentShape=" + currentShape + ", actionIndex=" + actionIndex + ", screenSize=" + screenSize + '}';
   }
-
+  
 }

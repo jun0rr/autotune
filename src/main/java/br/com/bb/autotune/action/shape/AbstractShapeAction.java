@@ -4,25 +4,30 @@
  */
 package br.com.bb.autotune.action.shape;
 
+import br.com.bb.autotune.EditablePanel;
 import br.com.bb.autotune.Reference;
 import br.com.bb.autotune.ShapeInfo;
-import br.com.bb.autotune.settings.Settings;
+import br.com.bb.autotune.action.PanelAction;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.Objects;
 
 /**
  *
  * @author Juno
  */
-public abstract class AbstractShapeAction {
+public abstract class AbstractShapeAction implements PanelAction {
   
-  protected final Settings settings;
+  private final String name;
   
-  protected AbstractShapeAction(Settings s) {
-    this.settings = Objects.requireNonNull(s);
+  public AbstractShapeAction(String name) {
+    this.name  = Objects.requireNonNull(name);
+  }
+  
+  @Override
+  public String getName() {
+    return name;
   }
   
   protected Point getOrigin(MouseEvent e, Reference<ShapeInfo> current) {
@@ -46,8 +51,35 @@ public abstract class AbstractShapeAction {
     return new Rectangle(x, y, w, h);
   }
 
-  public abstract boolean accept();
+  public abstract boolean accept(EditablePanel p);
   
-  public abstract void perform(MouseEvent e, Reference<ShapeInfo> current, List<ShapeInfo> shapes);
+  public abstract void perform(EditablePanel p);
+
+  @Override
+  public int hashCode() {
+    int hash = 7;
+    hash = 71 * hash + Objects.hashCode(this.name);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final AbstractShapeAction other = (AbstractShapeAction) obj;
+    return Objects.equals(this.name, other.name);
+  }
+
+  @Override
+  public String toString() {
+    return "ShapeAction{" + "name=" + name + '}';
+  }
   
 }

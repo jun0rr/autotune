@@ -4,23 +4,28 @@
  */
 package br.com.bb.autotune.action.text;
 
-import br.com.bb.autotune.TextPoint;
+import br.com.bb.autotune.EditablePanel;
 import java.awt.event.KeyEvent;
 
 /**
  *
  * @author Juno
  */
-public class EnterAction implements TextAction {
-
-  @Override
-  public boolean accept(KeyEvent[] e) {
-    return KeyEvent.VK_ENTER == e[0].getKeyCode();
+public class EnterAction extends AbstractTextAction {
+  
+  public EnterAction() {
+    super("EnterAction");
   }
 
   @Override
-  public void perform(KeyEvent[] e, TextPoint t) {
-    t.text().append('\n');
+  public boolean accept(EditablePanel p) {
+    return p.getCurrentText().isPresent() 
+        && KeyEvent.VK_ENTER == p.getLastKeyEvents()[0].getKeyCode();
+  }
+
+  @Override
+  public void perform(EditablePanel p) {
+    p.getCurrentText().get().text().append('\n');
   }
   
 }

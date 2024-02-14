@@ -14,12 +14,13 @@ import java.awt.event.KeyEvent;
 public class UpdateAction extends AbstractPanelAction {
   
   public UpdateAction() {
-    super("PerformUpdate");
+    super("UpdateAction");
   }
   
   @Override
   public boolean accept(EditablePanel p) {
-    return KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+    return p.getLastKeyEvents()[0] != null
+        && KeyEvent.VK_F2 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isControlDown();
   }
   
@@ -31,7 +32,7 @@ public class UpdateAction extends AbstractPanelAction {
         .skip(p.getActionIndex().get())
         .peek(a->p.getActionIndex().incrementAndGet())
         .peek(a->p.getAutotune().delay(10))
-        .forEach(a->a.perform(p));
+        .forEach(a->a.accept(p.getAutotune()));
     p.getAutotune().delay(100);
     p.getBackgroundImage().set(
         p.getAutotune().takeScreenshot()

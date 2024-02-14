@@ -4,23 +4,30 @@
  */
 package br.com.bb.autotune.action.text;
 
-import br.com.bb.autotune.TextPoint;
+import br.com.bb.autotune.EditablePanel;
 import java.awt.event.KeyEvent;
 
 /**
  *
  * @author Juno
  */
-public class BackspaceAction implements TextAction {
-
-  @Override
-  public boolean accept(KeyEvent[] e) {
-    return KeyEvent.VK_BACK_SPACE == e[0].getKeyCode();
+public class BackspaceAction extends AbstractTextAction {
+  
+  public BackspaceAction() {
+    super("BackspaceAction");
   }
 
   @Override
-  public void perform(KeyEvent[] e, TextPoint t) {
-    t.text().deleteCharAt(t.text().length() -1);
+  public boolean accept(EditablePanel p) {
+    return p.getCurrentText().isPresent() 
+        && KeyEvent.VK_BACK_SPACE == p.getLastKeyEvents()[0].getKeyCode();
+  }
+
+  @Override
+  public void perform(EditablePanel p) {
+    p.getCurrentText().get().text().deleteCharAt(
+        p.getCurrentText().get().text().length() -1
+    );
   }
   
 }

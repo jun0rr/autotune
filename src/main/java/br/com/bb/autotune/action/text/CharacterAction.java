@@ -5,23 +5,27 @@
 package br.com.bb.autotune.action.text;
 
 import br.com.bb.autotune.Autotune;
-import br.com.bb.autotune.TextPoint;
-import java.awt.event.KeyEvent;
+import br.com.bb.autotune.EditablePanel;
 
 /**
  *
  * @author Juno
  */
-public class CharacterAction implements TextAction {
-
-  @Override
-  public boolean accept(KeyEvent[] e) {
-    return Autotune.CHAR_MAP.containsKey(e[0].getKeyChar());
-  }
-
-  @Override
-  public void perform(KeyEvent[] e, TextPoint t) {
-    t.text().append(e[0].getKeyChar());
-  }
+public class CharacterAction extends AbstractTextAction {
   
+  public CharacterAction() {
+    super("CharacterAction");
+  }
+
+  @Override
+  public boolean accept(EditablePanel p) {
+    return p.getCurrentText().isPresent() 
+        && Autotune.CHAR_MAP.containsKey(p.getLastKeyEvents()[0].getKeyChar());
+  }
+
+  @Override
+  public void perform(EditablePanel p) {
+    p.getCurrentText().get().text().append(p.getLastKeyEvents()[0].getKeyChar());
+  }
+
 }

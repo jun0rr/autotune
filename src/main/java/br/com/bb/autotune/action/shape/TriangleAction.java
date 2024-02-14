@@ -4,15 +4,12 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.Reference;
+import br.com.bb.autotune.EditablePanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
-import br.com.bb.autotune.settings.Settings;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  *
@@ -20,27 +17,27 @@ import java.util.List;
  */
 public class TriangleAction extends AbstractShapeAction {
 
-  public TriangleAction(Settings s) {
-    super(s);
+  public TriangleAction() {
+    super("Triangle");
   }
   
   @Override
-  public boolean accept() {
-    return DrawMode.TRIANGLE == settings.getDrawSettings().getDrawMode();
+  public boolean accept(EditablePanel p) {
+    return DrawMode.TRIANGLE == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(MouseEvent e, Reference<ShapeInfo> current, List<ShapeInfo> shapes) {
-    Point origin = getOrigin(e, current);
-    Rectangle size = getSize(e, current);
-    Polygon p = new Polygon();
-    p.addPoint(size.x + size.width/2, size.y);
-    p.addPoint(size.x + size.width, size.y + size.height);
-    p.addPoint(size.x, size.y + size.height);
-    current.set(new ShapeInfo(origin, p,
-        settings.getDrawSettings().getStroke(),
-        settings.getCurrentColor().color(),
-        settings.getDrawSettings().isFillEnabled()
+  public void perform(EditablePanel p) {
+    Point origin = getOrigin(p.getLastMouseEvents()[0], p.getCurrentShape());
+    Rectangle size = getSize(p.getLastMouseEvents()[0], p.getCurrentShape());
+    Polygon po = new Polygon();
+    po.addPoint(size.x + size.width/2, size.y);
+    po.addPoint(size.x + size.width, size.y + size.height);
+    po.addPoint(size.x, size.y + size.height);
+    p.getCurrentShape().set(new ShapeInfo(origin, po,
+        p.getSettings().getDrawSettings().getStroke(),
+        p.getSettings().getCurrentColor().color(),
+        p.getSettings().getDrawSettings().isFillEnabled()
     ));
   }
   

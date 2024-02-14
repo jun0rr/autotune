@@ -37,6 +37,7 @@ public class DefaultPanelAction implements PanelAction {
     perform.accept(p);
   }
 
+  @Override
   public String getName() {
     return name;
   }

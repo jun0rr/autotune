@@ -4,15 +4,13 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.Reference;
+import br.com.bb.autotune.EditablePanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
 import br.com.bb.autotune.settings.Settings;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
-import java.util.List;
 
 /**
  *
@@ -20,19 +18,19 @@ import java.util.List;
  */
 public class ArrowLeftAction extends AbstractShapeAction {
 
-  public ArrowLeftAction(Settings s) {
-    super(s);
+  public ArrowLeftAction() {
+    super("ArrowLeft");
   }
   
   @Override
-  public boolean accept() {
-    return DrawMode.ARROW_LEFT == settings.getDrawSettings().getDrawMode();
+  public boolean accept(EditablePanel p) {
+    return DrawMode.ARROW_LEFT == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(MouseEvent e, Reference<ShapeInfo> current, List<ShapeInfo> shapes) {
-    Point origin = getOrigin(e, current);
-    Rectangle size = getSize(e, current);
+  public void perform(EditablePanel p) {
+    Point origin = getOrigin(p.getLastMouseEvents()[0], p.getCurrentShape());
+    Rectangle size = getSize(p.getLastMouseEvents()[0], p.getCurrentShape());
     Polygon b = new Polygon();
     b.addPoint(size.x, size.y + size.height/2);
     b.addPoint(size.x + size.width/2, size.y);
@@ -41,10 +39,10 @@ public class ArrowLeftAction extends AbstractShapeAction {
     b.addPoint(size.x + size.width, size.y + size.height/4*3);
     b.addPoint(size.x + size.width/2, size.y + size.height/4*3);
     b.addPoint(size.x + size.width/2, size.y + size.height);
-    current.set(new ShapeInfo(origin, b,
-        settings.getDrawSettings().getStroke(),
-        settings.getCurrentColor().color(),
-        settings.getDrawSettings().isFillEnabled()
+    p.getCurrentShape().set(new ShapeInfo(origin, b,
+        p.getSettings().getDrawSettings().getStroke(),
+        p.getSettings().getCurrentColor().color(),
+        p.getSettings().getDrawSettings().isFillEnabled()
     ));
   }
   
