@@ -7,6 +7,7 @@ package br.com.bb.autotune.action;
 import br.com.bb.autotune.Autotune;
 import java.util.Objects;
 import java.util.function.Consumer;
+import javax.swing.Icon;
 
 /**
  *
@@ -14,22 +15,26 @@ import java.util.function.Consumer;
  */
 public class DefaultRecordAction implements RecordAction {
   
-  private final String name;
+  private final String text;
+  
+  private final Icon icon;
   
   private final Consumer<Autotune> action;
   
-  public DefaultRecordAction(String name, Consumer<Autotune> c) {
-    this.name = Objects.requireNonNull(name);
+  public DefaultRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object... args) {
     this.action = Objects.requireNonNull(c);
-  }
-  
-  public DefaultRecordAction(Consumer<Autotune> c, String fmt, Object... args) {
-    this(String.format(fmt, args), c);
+    this.icon = Objects.requireNonNull(icon);
+    this.text = String.format(fmt, args);
   }
 
   @Override
-  public String getName() {
-    return name;
+  public String getText() {
+    return text;
+  }
+  
+  @Override
+  public Icon getIcon() {
+    return icon;
   }
 
   @Override
@@ -40,8 +45,8 @@ public class DefaultRecordAction implements RecordAction {
   @Override
   public int hashCode() {
     int hash = 7;
-    hash = 41 * hash + Objects.hashCode(this.name);
-    hash = 41 * hash + Objects.hashCode(this.action);
+    hash = 71 * hash + Objects.hashCode(this.text);
+    hash = 71 * hash + Objects.hashCode(this.icon);
     return hash;
   }
 
@@ -57,15 +62,15 @@ public class DefaultRecordAction implements RecordAction {
       return false;
     }
     final DefaultRecordAction other = (DefaultRecordAction) obj;
-    if (!Objects.equals(this.name, other.name)) {
+    if (!Objects.equals(this.text, other.text)) {
       return false;
     }
-    return Objects.equals(this.action, other.action);
+    return Objects.equals(this.icon, other.icon);
   }
 
   @Override
   public String toString() {
-    return "RecordAction{" + "name=" + name + '}';
+    return text;
   }
-  
+
 }

@@ -4,18 +4,21 @@
  */
 package br.com.bb.autotune.action;
 
-import br.com.bb.autotune.Autotune;
-import java.util.function.Consumer;
-import javax.swing.Icon;
+import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author F6036477
  */
-public interface RecordAction extends Consumer<Autotune> {
+public class RecordScript {
   
-  public String getText();
+  private final List<RecordAction> records;
   
-  public Icon getIcon();
+  public RecordScript(List<RecordAction> records) {
+    this.records = Objects.requireNonNull(records);
+  }
+  
+  
   
 }

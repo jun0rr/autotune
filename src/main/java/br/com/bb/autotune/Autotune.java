@@ -113,6 +113,11 @@ public class Autotune {
     return this;
   }
   
+  public Autotune copyScreenshot(Rectangle r) {
+    clip.setContents(new ImageSelection(takeScreenshot(r)), null);
+    return this;
+  }
+  
   public Autotune putClipboard(String s) {
     clip.setContents(new StringSelection(s), null);
     return this;
@@ -305,8 +310,11 @@ public class Autotune {
   }
   
   public BufferedImage takeScreenshot() {
-    Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    return robot.createScreenCapture(new Rectangle(d));
+    return takeScreenshot(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+  }
+  
+  public BufferedImage takeScreenshot(Rectangle r) {
+    return robot.createScreenCapture(r);
   }
   
   public Color pickColor(int x, int y) {

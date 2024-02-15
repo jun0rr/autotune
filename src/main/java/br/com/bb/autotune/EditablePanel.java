@@ -7,12 +7,14 @@ package br.com.bb.autotune;
 import br.com.bb.autotune.action.CancelSelectionAction;
 import br.com.bb.autotune.action.DefaultRecordAction;
 import br.com.bb.autotune.action.DeleteSelectionAction;
+import br.com.bb.autotune.action.DialogRecords;
 import br.com.bb.autotune.action.FinishShapeDrawAction;
 import br.com.bb.autotune.action.PanelAction;
 import br.com.bb.autotune.action.RecordAction;
 import br.com.bb.autotune.action.SaveImageAction;
 import br.com.bb.autotune.action.SetCurrentTextAction;
 import br.com.bb.autotune.action.ShowPopupMenuAction;
+import br.com.bb.autotune.action.ShowRecordListAction;
 import br.com.bb.autotune.action.UpdateAction;
 import br.com.bb.autotune.action.shape.ArrowDownAction;
 import br.com.bb.autotune.action.shape.ArrowLeftAction;
@@ -61,6 +63,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import javax.swing.Icon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -74,7 +77,12 @@ import jiconfont.swing.IconFontSwing;
  *
  * @author F6036477
  */
-public class EditablePanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener, Consumer<SettingsChangeEvent> {
+public class EditablePanel extends JPanel implements 
+    MouseListener, 
+    MouseMotionListener, 
+    MouseWheelListener, 
+    KeyListener, 
+    Consumer<SettingsChangeEvent> {
   
   private final Autotune auto;
   
@@ -83,6 +91,8 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   private final Settings settings;
   
   private final DialogSettings dialogsets;
+  
+  private final DialogRecords dialogrecs;
   
   private final List<TextPoint> textPoints;
   
@@ -131,14 +141,15 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     this.popupMenu = createPopupMenu();
     this.settings = new Settings();
     settings.addListener(this);
+    this.recordActions = new LinkedList<>();
     this.dialogsets = new DialogSettings(owner, settings);
+    this.dialogrecs = new DialogRecords(owner, recordActions);
     this.currentText = new Reference();
     this.currentShape = new Reference();
     this.selection = new Reference();
     this.actionIndex = new AtomicInteger(0);
     this.keyEvents = new KeyEvent[3];
     this.mouseEvents = new MouseEvent[3];
-    this.recordActions = new LinkedList<>();
     this.panelActions = new LinkedList<>();
     this.panelActions.add(new CancelSelectionAction());
     this.panelActions.add(new DeleteSelectionAction());
@@ -147,6 +158,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     this.panelActions.add(saveImageAction);
     this.panelActions.add(new SetCurrentTextAction());
     this.panelActions.add(new ShowPopupMenuAction());
+    this.panelActions.add(new ShowRecordListAction());
     this.updateAction = new UpdateAction();
     this.panelActions.add(updateAction);
     this.textActions = new ArrayList<>();
@@ -189,6 +201,10 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   
   public DialogSettings getDialogSettings() {
     return this.dialogsets;
+  }
+  
+  public DialogRecords getDialogRecords() {
+    return this.dialogrecs;
   }
   
   public JPopupMenu getPopupMenu() {
@@ -259,13 +275,13 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     return screenSize;
   }
   
-  public EditablePanel addRecordAction(String name, Consumer<Autotune> c) {
-    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(name, c));
+  public EditablePanel addRecordAction(String text, Icon icon, Consumer<Autotune> c) {
+    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, text));
     return this;
   }
   
-  public EditablePanel addRecordAction(Consumer<Autotune> c, String fmt, Object...args) {
-    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, fmt, args));
+  public EditablePanel addRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object...args) {
+    if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, fmt, args));
     return this;
   }
   
@@ -317,6 +333,21 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     toggleDrawItem();
   }
   
+  private void copyScreenshotRecord() {
+    Rectangle r;
+    if(selection.isPresent()) {
+      r = selection.get().getShape().getBounds();
+    }
+    else {
+      r = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+    }
+    addRecordAction(a->a.copyScreenshot(r), 
+        IconFontSwing.buildIcon(FontAwesome.PICTURE_O, 14f), 
+        "copyScreenshot( %d, %d, %d, %d )", 
+        r.x, r.y, r.width, r.height
+    );
+  }
+  
   private JPopupMenu createPopupMenu() {
     IconFontSwing.register(FontAwesome.getIconFont());
     JPopupMenu menu = new JPopupMenu();
@@ -325,16 +356,21 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     actionsMenu.setIcon(IconFontSwing.buildIcon(FontAwesome.BULLSEYE, 12f));
     JMenuItem icopy = new JMenuItem("Copy Screenshot");
     icopy.setIcon(IconFontSwing.buildIcon(FontAwesome.CLONE, 12f));
-    icopy.addActionListener(e->addRecordAction("copyScreenshot", a->a.copyScreenshot()));
+    icopy.addActionListener(e->copyScreenshotRecord());
     JMenuItem idelay = new JMenuItem("Delay");
     idelay.setIcon(IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 12f));
     idelay.addActionListener(e->addRecordAction(
         a->a.delay(settings.getAutoDelay()), 
+        IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 14f), 
         "delay( %d )", settings.getAutoDelay())
     );
     JMenuItem itype = new JMenuItem("Type Clipboard");
     itype.setIcon(IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 12f));
-    itype.addActionListener(e->addRecordAction("typeClipboard", a->a.typeClipboard()));
+    itype.addActionListener(e->addRecordAction(
+        "typeClipboard", 
+        IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+        a->a.typeClipboard())
+    );
     actionsMenu.add(icopy);
     actionsMenu.add(idelay);
     actionsMenu.add(itype);
@@ -381,7 +417,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     iupdate.addActionListener(e->updateAction.perform(this));
     
     JMenuItem irev = new JMenuItem("Rewind");
-    irev.setIcon(IconFontSwing.buildIcon(FontAwesome.ANGLE_DOUBLE_LEFT, 12f));
+    irev.setIcon(IconFontSwing.buildIcon(FontAwesome.BACKWARD, 12f));
     irev.addActionListener(e->actionIndex.set(0));
     
     JMenuItem iplay = new JMenuItem("Play");
@@ -390,6 +426,10 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
       actionIndex.set(0);
       updateAction.perform(this);
     });
+    
+    JMenuItem ilsrec = new JMenuItem("Record List");
+    ilsrec.setIcon(IconFontSwing.buildIcon(FontAwesome.BARS, 12f));
+    ilsrec.addActionListener(e->dialogsets.showDialog());
     
     JMenuItem iexit = new JMenuItem("Exit");
     iexit.setIcon(IconFontSwing.buildIcon(FontAwesome.SIGN_OUT, 12f));
@@ -405,6 +445,7 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
     menu.add(iupdate);
     menu.add(irev);
     menu.add(iplay);
+    menu.add(ilsrec);
     menu.add(new JPopupMenu.Separator());
     menu.add(iexit);
     return menu;
@@ -442,7 +483,6 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
       }
     }
     else if(selection.isPresent()) {
-      System.out.printf("* selection.isPresent(): %s%n", selection);
       Graphics2D gg = (Graphics2D) g;
       gg.setStroke(selection.get().getStroke());
       gg.setColor(settings.getCurrentColor().color());
@@ -493,57 +533,6 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
         .forEach(a->a.perform(this));
   }
 
-  private Point modPoint(Point p) {
-    return new Point(Math.round(p.x * xmod), Math.round(p.y * ymod));
-  }
-  
-  private void mousedo(MouseEvent e) {
-    if(e.isControlDown()) return;
-    Point mod = modPoint(e.getPoint());
-    switch(e.getID()) {
-      //case MouseEvent.MOUSE_MOVED:
-        //System.out.printf(">> action: mouseMove( %s )%n", modPoint(e.getPoint()));
-        //addAction(a->a.mouseMove(modPoint(e.getPoint())));
-        //break;
-      case MouseEvent.MOUSE_PRESSED:
-        System.out.printf(">> action: mouseMove( %s )%n", mod);
-        addRecordAction(a->a.mouseMove(mod), "mouseMove( %d, %d )", mod.x, mod.y);
-        System.out.printf(">> action: mousePress( %d )%n", e.getButton());
-        addRecordAction(a->a.mousePress(e.getButton()),  "mousePress( %d )", e.getButton());
-        break;
-      case MouseEvent.MOUSE_RELEASED:
-        System.out.printf(">> action: mouseMove( %s )%n", mod);
-        addRecordAction(a->a.mouseMove(mod), "mouseMove( %d, %d )", mod.x, mod.y);
-        System.out.printf(">> action: mouseRelease( %d )%n", e.getButton());
-        addRecordAction(a->a.mouseRelease(e.getButton()),  "mouseRelease( %d )", e.getButton());
-        break;
-      default:
-        break;
-    }
-  }
-  
-  private void keydo(KeyEvent e) {
-    switch(e.getExtendedKeyCode()) {
-      case 0x2f:
-        System.out.printf(">> action: keydo( /? )%n");
-        addRecordAction("keyType( ?/ )", Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'));
-        break;
-      case 0x10000c7:
-        System.out.printf(">> action: keydo( ç )%n");
-        addRecordAction("keyType( çÇ )", Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'));
-        break;
-      default:
-        if(KeyEvent.KEY_PRESSED == e.getID()) {
-          System.out.printf(">> action: keyPress( %s=%d )%n", e.getKeyChar(), e.getExtendedKeyCode());
-        }
-        else {
-          System.out.printf(">> action: keyRelease( %s=%d )%n", e.getKeyChar(), e.getExtendedKeyCode());
-        }
-        addRecordAction(a->a.keydo(e), "keyType( %s=%d )", e.getKeyChar(), e.getExtendedKeyCode());
-        break;
-    }
-  }
-  
   @Override 
   public void keyPressed(KeyEvent e) {
     addKeyEvent(e);
@@ -584,8 +573,77 @@ public class EditablePanel extends JPanel implements MouseListener, MouseMotionL
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
     System.out.printf(">> action: mouseWheel( %d )%n", e.getWheelRotation());
-    addRecordAction(a->a.mouseWheel(e.getWheelRotation()), "mouseWheel( %d )", e.getWheelRotation());
+    addRecordAction(a->a.mouseWheel(e.getWheelRotation()), 
+        IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+        "mouseWheel( %d )", e.getWheelRotation()
+    );
     addKeyEvent(null);
+  }
+  
+  private Point modPoint(Point p) {
+    return new Point(Math.round(p.x * xmod), Math.round(p.y * ymod));
+  }
+  
+  private void mousedo(MouseEvent e) {
+    if(e.isControlDown()) return;
+    Point mod = modPoint(e.getPoint());
+    switch(e.getID()) {
+      case MouseEvent.MOUSE_PRESSED:
+        addRecordAction(a->a.mouseMove(mod), 
+            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            "mouseMove( %d, %d )", mod.x, mod.y
+        );
+        addRecordAction(a->a.mousePress(e.getButton()), 
+            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            "mousePress( %d )", e.getButton()
+        );
+        break;
+      case MouseEvent.MOUSE_RELEASED:
+        addRecordAction(a->a.mouseMove(mod), 
+            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            "mouseMove( %d, %d )", mod.x, mod.y
+        );
+        addRecordAction(a->a.mouseRelease(e.getButton()), 
+            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            "mouseRelease( %d )", e.getButton()
+        );
+        break;
+      default:
+        break;
+    }
+  }
+  
+  private void keydo(KeyEvent e) {
+    switch(e.getExtendedKeyCode()) {
+      case 0x2f:
+        addRecordAction(Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'), 
+            IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+            "keyType( '?'=%d )", e.getExtendedKeyCode()
+        );
+        break;
+      case 0x10000c7:
+        addRecordAction(Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'), 
+            IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+            "keyType( 'ç'=%d )", e.getExtendedKeyCode()
+        );
+        break;
+      default:
+        if(KeyEvent.KEY_PRESSED == e.getID()) {
+          addRecordAction(a->a.keydo(e), 
+              IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+              "keyPress( '%s'=%d )", 
+              e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()
+          );
+        }
+        else {
+          addRecordAction(a->a.keydo(e), 
+              IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+              "keyRelease( '%s'=%d )", 
+              e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()
+          );
+        }
+        break;
+    }
   }
   
   @Override public void mouseMoved(MouseEvent e) {}
