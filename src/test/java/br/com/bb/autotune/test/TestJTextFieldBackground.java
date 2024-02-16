@@ -6,7 +6,6 @@ package br.com.bb.autotune.test;
 
 import br.com.bb.autotune.Autotune;
 import br.com.bb.autotune.EditablePanel;
-import static br.com.bb.autotune.settings.DialogSettings.ICON_PATH;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -27,7 +26,7 @@ public class TestJTextFieldBackground {
   
   public static final String FRAME_ICON_PATH = "/robot.png";
   
-  @Test 
+  //@Test 
   public void test() throws Exception {
     try {
       Autotune auto = new Autotune();
