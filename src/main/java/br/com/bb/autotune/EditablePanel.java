@@ -35,6 +35,8 @@ import br.com.bb.autotune.action.text.CharacterAction;
 import br.com.bb.autotune.action.text.TabAction;
 import br.com.bb.autotune.action.text.AbstractTextAction;
 import br.com.bb.autotune.action.text.TildeAction;
+import br.com.bb.autotune.icon.FontAwesome;
+import br.com.bb.autotune.icon.FontIcon;
 import br.com.bb.autotune.settings.DialogSettings;
 import br.com.bb.autotune.settings.DrawSettings;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
@@ -70,8 +72,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import jiconfont.icons.font_awesome.FontAwesome;
-import jiconfont.swing.IconFontSwing;
 
 /**
  *
@@ -315,11 +315,11 @@ public class EditablePanel extends JPanel implements
   private void toggleDrawItem() {
     if(settings.getDrawSettings().isDrawModeEnabled()) {
       drawItem.setText("Select");
-      drawItem.setIcon(IconFontSwing.buildIcon(FontAwesome.EXTERNAL_LINK, 12f));
+      drawItem.setIcon(FontIcon.createIcon(FontAwesome.EXTERNAL_LINK, 12f));
     }
     else {
       drawItem.setText("Draw");
-      drawItem.setIcon(IconFontSwing.buildIcon(FontAwesome.PAINT_BRUSH, 12f, Settings.GREEN_DARKEN3.color()));
+      drawItem.setIcon(FontIcon.createIcon(FontAwesome.PAINT_BRUSH, Settings.GREEN_DARKEN3.color(), 12f));
     }
   }
   
@@ -342,49 +342,48 @@ public class EditablePanel extends JPanel implements
       r = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
     }
     addRecordAction(a->a.copyScreenshot(r), 
-        IconFontSwing.buildIcon(FontAwesome.PICTURE_O, 14f), 
+        FontIcon.createIcon(FontAwesome.PICTURE_O, 14f), 
         "copyScreenshot( %d, %d, %d, %d )", 
         r.x, r.y, r.width, r.height
     );
   }
   
   private JPopupMenu createPopupMenu() {
-    IconFontSwing.register(FontAwesome.getIconFont());
     JPopupMenu menu = new JPopupMenu();
     
     JMenu actionsMenu = new JMenu("Actions");
-    actionsMenu.setIcon(IconFontSwing.buildIcon(FontAwesome.BULLSEYE, 12f));
+    actionsMenu.setIcon(FontIcon.createIcon(FontAwesome.BULLSEYE, 12f));
     JMenuItem icopy = new JMenuItem("Copy Screenshot");
-    icopy.setIcon(IconFontSwing.buildIcon(FontAwesome.CLONE, 12f));
+    icopy.setIcon(FontIcon.createIcon(FontAwesome.CLONE, 12f));
     icopy.addActionListener(e->copyScreenshotRecord());
     JMenuItem idelay = new JMenuItem("Delay");
-    idelay.setIcon(IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 12f));
+    idelay.setIcon(FontIcon.createIcon(FontAwesome.CLOCK_O, 12f));
     idelay.addActionListener(e->addRecordAction(
         a->a.delay(settings.getAutoDelay()), 
-        IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 14f), 
+        FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), 
         "delay( %d )", settings.getAutoDelay())
     );
     JMenuItem itype = new JMenuItem("Type Clipboard");
-    itype.setIcon(IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 12f));
+    itype.setIcon(FontIcon.createIcon(FontAwesome.KEYBOARD_O, 12f));
     itype.addActionListener(e->addRecordAction(
         "typeClipboard", 
-        IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+        FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
         a->a.typeClipboard())
     );
     actionsMenu.add(icopy);
     actionsMenu.add(idelay);
     actionsMenu.add(itype);
     
-    JMenuItem isaveimg = new JMenuItem("Save Image");
-    isaveimg.setIcon(IconFontSwing.buildIcon(FontAwesome.FLOPPY_O, 12f));
+    JMenuItem isaveimg = new JMenuItem("Save Image (Alt+F3)");
+    isaveimg.setIcon(FontIcon.createIcon(FontAwesome.FLOPPY_O, 12f));
     isaveimg.addActionListener(a->saveImageAction.perform(this));
     
     JMenuItem isets = new JMenuItem("Settings");
-    isets.setIcon(IconFontSwing.buildIcon(FontAwesome.COG, 12f));
+    isets.setIcon(FontIcon.createIcon(FontAwesome.COG, 12f));
     isets.addActionListener(e->dialogsets.showDialog());
     
     JMenu shapesMenu = new JMenu("Shapes");
-    shapesMenu.setIcon(IconFontSwing.buildIcon(FontAwesome.OBJECT_GROUP, 12f));
+    shapesMenu.setIcon(FontIcon.createIcon(FontAwesome.OBJECT_GROUP, 12f));
     for(int i = 0; i < DialogSettings.SHAPE_OPTIONS.length; i++) {
       JLabel l = (JLabel) DialogSettings.SHAPE_OPTIONS[i];
       JMenuItem item = new JMenuItem(l.getText());
@@ -396,43 +395,43 @@ public class EditablePanel extends JPanel implements
       shapesMenu.add(item);
     }
     
-    drawItem.setIcon(IconFontSwing.buildIcon(FontAwesome.PAINT_BRUSH, 12f, Settings.GREEN_DARKEN3.color()));
+    drawItem.setIcon(FontIcon.createIcon(FontAwesome.PAINT_BRUSH, Settings.GREEN_DARKEN3.color(), 12f));
     drawItem.addActionListener(e->toggleDrawSettings());
     
-    JMenuItem irec = new JMenuItem("Record");
-    irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f, Color.BLACK));
+    JMenuItem irec = new JMenuItem("Record (Alt+R)");
+    irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
     irec.addActionListener(e->{
       settings.setRecord(!settings.isRecord());
       if(settings.isRecord()) {
-        irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE, 12f, Color.RED));
+        irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE, Color.RED, 12f));
       }
       else {
-        irec.setIcon(IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f, Color.BLACK));
+        irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
       }
       irec.repaint();
     });
     
-    JMenuItem iupdate = new JMenuItem("Update");
-    iupdate.setIcon(IconFontSwing.buildIcon(FontAwesome.REFRESH, 12f));
+    JMenuItem iupdate = new JMenuItem("Update (Alt+F5)");
+    iupdate.setIcon(FontIcon.createIcon(FontAwesome.REFRESH, 12f));
     iupdate.addActionListener(e->updateAction.perform(this));
     
-    JMenuItem irev = new JMenuItem("Rewind");
-    irev.setIcon(IconFontSwing.buildIcon(FontAwesome.BACKWARD, 12f));
+    JMenuItem irev = new JMenuItem("Rewind (Alt+F6)");
+    irev.setIcon(FontIcon.createIcon(FontAwesome.BACKWARD, 12f));
     irev.addActionListener(e->actionIndex.set(0));
     
-    JMenuItem iplay = new JMenuItem("Play");
-    iplay.setIcon(IconFontSwing.buildIcon(FontAwesome.PLAY_CIRCLE, 12f));
+    JMenuItem iplay = new JMenuItem("Play (Alt+F7)");
+    iplay.setIcon(FontIcon.createIcon(FontAwesome.PLAY_CIRCLE, 12f));
     iplay.addActionListener(e->{
       actionIndex.set(0);
       updateAction.perform(this);
     });
     
-    JMenuItem ilsrec = new JMenuItem("Record List");
-    ilsrec.setIcon(IconFontSwing.buildIcon(FontAwesome.BARS, 12f));
-    ilsrec.addActionListener(e->dialogsets.showDialog());
+    JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
+    ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));
+    ilsrec.addActionListener(e->dialogrecs.showDialog());
     
     JMenuItem iexit = new JMenuItem("Exit");
-    iexit.setIcon(IconFontSwing.buildIcon(FontAwesome.SIGN_OUT, 12f));
+    iexit.setIcon(FontIcon.createIcon(FontAwesome.SIGN_OUT, 12f));
     iexit.addActionListener(e->System.exit(0));
     
     menu.add(actionsMenu);
@@ -541,6 +540,9 @@ public class EditablePanel extends JPanel implements
     panelActions.stream()
         .filter(a->a.accept(this))
         .forEach(a->a.perform(this));
+    textActions.stream()
+        .filter(a->a.accept(this))
+        .forEach(a->a.perform(this));
   }
   
   @Override
@@ -549,9 +551,6 @@ public class EditablePanel extends JPanel implements
     addMouseEvent(null);
     keydo(e);
     panelActions.stream()
-        .filter(a->a.accept(this))
-        .forEach(a->a.perform(this));
-    textActions.stream()
         .filter(a->a.accept(this))
         .forEach(a->a.perform(this));
     repaint();
@@ -574,7 +573,7 @@ public class EditablePanel extends JPanel implements
   public void mouseWheelMoved(MouseWheelEvent e) {
     System.out.printf(">> action: mouseWheel( %d )%n", e.getWheelRotation());
     addRecordAction(a->a.mouseWheel(e.getWheelRotation()), 
-        IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+        FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
         "mouseWheel( %d )", e.getWheelRotation()
     );
     addKeyEvent(null);
@@ -590,21 +589,21 @@ public class EditablePanel extends JPanel implements
     switch(e.getID()) {
       case MouseEvent.MOUSE_PRESSED:
         addRecordAction(a->a.mouseMove(mod), 
-            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseMove( %d, %d )", mod.x, mod.y
         );
         addRecordAction(a->a.mousePress(e.getButton()), 
-            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mousePress( %d )", e.getButton()
         );
         break;
       case MouseEvent.MOUSE_RELEASED:
         addRecordAction(a->a.mouseMove(mod), 
-            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseMove( %d, %d )", mod.x, mod.y
         );
         addRecordAction(a->a.mouseRelease(e.getButton()), 
-            IconFontSwing.buildIcon(FontAwesome.MOUSE_POINTER, 14f), 
+            FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseRelease( %d )", e.getButton()
         );
         break;
@@ -616,28 +615,34 @@ public class EditablePanel extends JPanel implements
   private void keydo(KeyEvent e) {
     switch(e.getExtendedKeyCode()) {
       case 0x2f:
-        addRecordAction(Autotune.CHAR_MAP.get(e.isShiftDown() ? '?' : '/'), 
-            IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
-            "keyType( '?'=%d )", e.getExtendedKeyCode()
-        );
+        if(KeyEvent.KEY_PRESSED == e.getID()) {
+          char c = e.isShiftDown() ? '?' : '/';
+          addRecordAction(Autotune.CHAR_MAP.get(c), 
+              FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
+              "keyType( '%s'=%d )", c, e.getExtendedKeyCode()
+          );
+        }
         break;
       case 0x10000c7:
-        addRecordAction(Autotune.CHAR_MAP.get(e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç'), 
-            IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
-            "keyType( 'ç'=%d )", e.getExtendedKeyCode()
-        );
+        if(KeyEvent.KEY_PRESSED == e.getID()) {
+          char c = e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç';
+          addRecordAction(Autotune.CHAR_MAP.get(c), 
+              FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
+              "keyType( '%s'=%d )", c, e.getExtendedKeyCode()
+          );
+        }
         break;
       default:
         if(KeyEvent.KEY_PRESSED == e.getID()) {
           addRecordAction(a->a.keydo(e), 
-              IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+              FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyPress( '%s'=%d )", 
               e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()
           );
         }
         else {
           addRecordAction(a->a.keydo(e), 
-              IconFontSwing.buildIcon(FontAwesome.KEYBOARD_O, 14f), 
+              FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyRelease( '%s'=%d )", 
               e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()
           );

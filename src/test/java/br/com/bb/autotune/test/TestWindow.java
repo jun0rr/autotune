@@ -17,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import org.junit.jupiter.api.Test;
 
 /**
  *

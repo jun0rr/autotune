@@ -31,6 +31,7 @@ public class CrasisAction extends AbstractTextAction {
         * mod(p.getLastKeyEvents()[0]) * p.getLastKeyEvents()[0].getExtendedKeyCode();
     if(Autotune.KEYCODES_MAP.containsKey(code)) {
       p.getCurrentText().get().text().append(Autotune.KEYCODES_MAP.get(code));
+      p.getLastKeyEvents()[0] = null;
     }
   }
   

@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
  *
  * @author F6036477
  */
-public class MouseMoveEntry implements RecordScriptEntry {
+public class KeyPressEntry implements RecordScriptEntry {
 
-  public static final String ENTRY_REGEX = "mouseMove\\(\\s?([0-9]{1,5}),\\s?([0-9]{1,5})\\s?\\)";
+  public static final String ENTRY_REGEX = "keyPress\\(\\s?\\'(.)\\'\\=([0-9]{1,10})\\s?\\)";
   
   public static final Pattern ENTRY_PATTERN = Pattern.compile(ENTRY_REGEX);
   
@@ -30,10 +30,9 @@ public class MouseMoveEntry implements RecordScriptEntry {
   public RecordAction parse(String s) {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
-    int x = Integer.parseInt(m.group(1));
-    int y = Integer.parseInt(m.group(2));
-    return new DefaultRecordAction(a->a.mouseMove(x, y), 
-        FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), s);
+    int keyCode = Integer.parseInt(m.group(2));
+    return new DefaultRecordAction(a->a.keyPress(keyCode), 
+        FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
   }
 
   @Override

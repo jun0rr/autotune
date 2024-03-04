@@ -6,8 +6,6 @@ package br.com.bb.autotune.action.text;
 
 import br.com.bb.autotune.Autotune;
 import br.com.bb.autotune.EditablePanel;
-import br.com.bb.autotune.TextPoint;
-import java.awt.event.KeyEvent;
 
 /**
  *
@@ -22,7 +20,8 @@ public class TildeAction extends AbstractTextAction {
   @Override
   public boolean accept(EditablePanel p) {
     return p.getCurrentText().isPresent() 
-        && p.getLastKeyEvents()[1] != null && p.getLastKeyEvents()[1].getExtendedKeyCode() == 131;
+        && p.getLastKeyEvents()[1] != null 
+        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 131;
   }
 
   @Override
@@ -31,6 +30,7 @@ public class TildeAction extends AbstractTextAction {
         * mod(p.getLastKeyEvents()[0]) * p.getLastKeyEvents()[0].getExtendedKeyCode();
     if(Autotune.KEYCODES_MAP.containsKey(code)) {
       p.getCurrentText().get().text().append(Autotune.KEYCODES_MAP.get(code));
+      p.getLastKeyEvents()[0] = null;
     }
   }
   

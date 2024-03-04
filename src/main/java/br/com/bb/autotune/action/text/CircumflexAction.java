@@ -21,6 +21,7 @@ public class CircumflexAction extends AbstractTextAction {
   public boolean accept(EditablePanel p) {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[2] != null 
+        && p.getLastKeyEvents()[1] != null 
         && p.getLastKeyEvents()[2].getExtendedKeyCode() == 131 
         && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16;
   }
@@ -31,6 +32,7 @@ public class CircumflexAction extends AbstractTextAction {
         * mod(p.getLastKeyEvents()[0]) * p.getLastKeyEvents()[0].getExtendedKeyCode();
     if(Autotune.KEYCODES_MAP.containsKey(code)) {
       p.getCurrentText().get().text().append(Autotune.KEYCODES_MAP.get(code));
+      p.getLastKeyEvents()[0] = null;
     }
   }
   

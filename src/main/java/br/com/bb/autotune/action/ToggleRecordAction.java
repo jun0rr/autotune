@@ -11,17 +11,17 @@ import java.awt.event.KeyEvent;
  *
  * @author Juno
  */
-public class ShowRecordListAction extends AbstractPanelAction {
+public class ToggleRecordAction extends AbstractPanelAction {
   
-  public ShowRecordListAction() {
-    super("ShowRecordListAction");
+  public ToggleRecordAction() {
+    super("ToggleRecordAction");
   }
   
   @Override
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
-        && KeyEvent.VK_L == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isControlDown();
+        && KeyEvent.VK_R == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && p.getLastKeyEvents()[0].isAltDown();
   }
   
   @Override
@@ -30,7 +30,7 @@ public class ShowRecordListAction extends AbstractPanelAction {
       p.getRecordActions().remove(p.getRecordActions().size() -1);
       p.getRecordActions().remove(p.getRecordActions().size() -1);
     }
-    p.getDialogRecords().showDialog();
+    p.getSettings().setRecord(!p.getSettings().isRecord());
   }
   
 }

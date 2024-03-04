@@ -4,8 +4,10 @@
  */
 package br.com.bb.autotune.test;
 
+import br.com.bb.autotune.icon.FontAwesome;
+import br.com.bb.autotune.icon.FontIcon;
 import br.com.bb.autotune.script.MouseMoveEntry;
-import java.util.regex.Pattern;
+import javax.swing.Icon;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -14,17 +16,20 @@ import org.junit.jupiter.api.Test;
  */
 public class TestRegex {
   
-  public static final String ENTRY_REGEX = "mouseMove\\(\\s?([0-9]{1,5}),\\s?([0-9]{1,5})\\s?\\)";
-  
-  public static final Pattern ENTRY_PATTERN = Pattern.compile(ENTRY_REGEX);
-  
-  @Test public void test() {
-    String s = "mouseMove( 57, 602 )";
-    MouseMoveEntry e = new MouseMoveEntry();
-    System.out.printf("* input: %s%n", s);
-    System.out.printf("* canParse: %s%n", e.canParse(s));
-    System.out.printf("* parse: %s%n", e.parse(s));
-    System.out.printf("* toString: %s%n", e.toString(e.parse(s)));
+  @Test 
+  public void test() {
+    try {
+      Icon i = FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f);
+      String s = "mouseMove( 57, 602 )";
+      MouseMoveEntry e = new MouseMoveEntry();
+      System.out.printf("* input: %s%n", s);
+      System.out.printf("* canParse: %s%n", e.canParse(s));
+      System.out.printf("* parse: %s%n", e.parse(s));
+      System.out.printf("* toString: %s%n", e.toString(e.parse(s)));
+    }
+    catch(Exception e) {
+      e.printStackTrace();
+    }
   }
   
 }

@@ -14,16 +14,6 @@
 
     <dependencies>
       <dependency>
-        <groupId>com.github.jiconfont</groupId>
-        <artifactId>jiconfont-swing</artifactId>
-        <version>1.0.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.jiconfont</groupId>
-        <artifactId>jiconfont-font_awesome</artifactId>
-        <version>4.7.0.1</version>
-      </dependency>
-      <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter-api</artifactId>
           <version>5.7.0</version>

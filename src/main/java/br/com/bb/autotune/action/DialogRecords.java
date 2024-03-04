@@ -4,6 +4,8 @@
  */
 package br.com.bb.autotune.action;
 
+import br.com.bb.autotune.icon.FontAwesome;
+import br.com.bb.autotune.icon.FontIcon;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -17,11 +19,8 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
-import jiconfont.icons.font_awesome.FontAwesome;
-import jiconfont.swing.IconFontSwing;
 
 /**
  *
@@ -62,7 +61,7 @@ public class DialogRecords extends JDialog {
   }
   
   private void populate() {
-    JButton rmRecord = new JButton("Remove Record", IconFontSwing.buildIcon(FontAwesome.TRASH_O, 14f));
+    JButton rmRecord = new JButton("Remove Record", FontIcon.createIcon(FontAwesome.TRASH_O, 14f));
     rmRecord.setPreferredSize(new Dimension(140, 25));
     rmRecord.addActionListener(e->removeSelectedRecords());
     GridBagConstraints c = new GridBagConstraints();
@@ -73,8 +72,9 @@ public class DialogRecords extends JDialog {
     c.insets = new Insets(10, 20, 10, 5);
     add(rmRecord, c);
     
-    JButton saveScript = new JButton("Save Script", IconFontSwing.buildIcon(FontAwesome.FLOPPY_O, 14f));
+    JButton saveScript = new JButton("Save Script", FontIcon.createIcon(FontAwesome.FLOPPY_O, 14f));
     saveScript.setPreferredSize(new Dimension(140, 25));
+    saveScript.addActionListener(e->new SaveRecordsAction().save(DialogRecords.this, records));
     c = new GridBagConstraints();
     c.gridx = 1;
     c.gridy = 0;

@@ -24,11 +24,11 @@ public class ShowPopupMenuAction extends AbstractPanelAction {
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isControlDown()
+        && p.getLastKeyEvents()[0].isAltDown()
         || (p.getLastMouseEvents()[0] != null
         && MouseEvent.MOUSE_CLICKED == p.getLastMouseEvents()[0].getID() 
         && MouseEvent.BUTTON3 == p.getLastMouseEvents()[0].getButton()
-        && p.getLastMouseEvents()[0].isControlDown());
+        && p.getLastMouseEvents()[0].isAltDown());
   }
   
   @Override

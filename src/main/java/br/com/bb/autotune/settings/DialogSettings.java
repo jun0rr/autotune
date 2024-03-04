@@ -4,6 +4,8 @@
  */
 package br.com.bb.autotune.settings;
 
+import br.com.bb.autotune.icon.FontAwesome;
+import br.com.bb.autotune.icon.FontIcon;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,8 +37,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
-import jiconfont.icons.font_awesome.FontAwesome;
-import jiconfont.swing.IconFontSwing;
 
 /**
  *
@@ -47,16 +47,16 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   public static final String ICON_PATH = "/gear.png";
   
   public static final Object[] SHAPE_OPTIONS = {
-    new JLabel("None", IconFontSwing.buildIcon(FontAwesome.BAN, 12f), SwingConstants.LEFT),
-    new JLabel("Line", IconFontSwing.buildIcon(FontAwesome.MINUS, 12f), SwingConstants.LEFT),
-    new JLabel("Rectange", IconFontSwing.buildIcon(FontAwesome.SQUARE_O, 12f), SwingConstants.LEFT),
-    new JLabel("Triangle", IconFontSwing.buildIcon(FontAwesome.CARET_UP, 14f), SwingConstants.LEFT),
-    new JLabel("Circle", IconFontSwing.buildIcon(FontAwesome.CIRCLE_O, 12f), SwingConstants.LEFT),
-    new JLabel("Arrow Up", IconFontSwing.buildIcon(FontAwesome.ARROW_UP, 12f), SwingConstants.LEFT),
-    new JLabel("Arrow Right", IconFontSwing.buildIcon(FontAwesome.ARROW_RIGHT, 12f), SwingConstants.LEFT),
-    new JLabel("Arrow Down", IconFontSwing.buildIcon(FontAwesome.ARROW_DOWN, 12f), SwingConstants.LEFT),
-    new JLabel("Arrow Left", IconFontSwing.buildIcon(FontAwesome.ARROW_LEFT, 12f), SwingConstants.LEFT),
-    new JLabel("Free", IconFontSwing.buildIcon(FontAwesome.PENCIL, 12f), SwingConstants.LEFT),
+    new JLabel("None", FontIcon.createIcon(FontAwesome.BAN, 12f), SwingConstants.LEFT),
+    new JLabel("Line", FontIcon.createIcon(FontAwesome.MINUS, 12f), SwingConstants.LEFT),
+    new JLabel("Rectange", FontIcon.createIcon(FontAwesome.SQUARE_O, 12f), SwingConstants.LEFT),
+    new JLabel("Triangle", FontIcon.createIcon(FontAwesome.CARET_UP, 14f), SwingConstants.LEFT),
+    new JLabel("Circle", FontIcon.createIcon(FontAwesome.CIRCLE_O, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Up", FontIcon.createIcon(FontAwesome.ARROW_UP, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Right", FontIcon.createIcon(FontAwesome.ARROW_RIGHT, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Down", FontIcon.createIcon(FontAwesome.ARROW_DOWN, 12f), SwingConstants.LEFT),
+    new JLabel("Arrow Left", FontIcon.createIcon(FontAwesome.ARROW_LEFT, 12f), SwingConstants.LEFT),
+    new JLabel("Free", FontIcon.createIcon(FontAwesome.PENCIL, 12f), SwingConstants.LEFT),
   };
   
   private final Settings settings;
@@ -181,7 +181,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   }
   
   private void createFontPanel(Font labelfont) {
-    JLabel lfont = new JLabel("Font", IconFontSwing.buildIcon(FontAwesome.FONT, 14f), SwingConstants.LEFT);
+    JLabel lfont = new JLabel("Font", FontIcon.createIcon(FontAwesome.FONT, 14f), SwingConstants.LEFT);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 0;
@@ -300,7 +300,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   }
   
   private void createColorPanel(Font labelfont) {
-    JLabel lcolor = new JLabel("Color", IconFontSwing.buildIcon(FontAwesome.EYEDROPPER, 14f), SwingConstants.LEFT);
+    JLabel lcolor = new JLabel("Color", FontIcon.createIcon(FontAwesome.EYEDROPPER, 14f), SwingConstants.LEFT);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 3;
@@ -388,7 +388,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   }
   
   private void createDrawPanel(Font labelfont) {
-    JLabel ldraw = new JLabel("Draw", IconFontSwing.buildIcon(FontAwesome.PICTURE_O, 14f), SwingConstants.LEFT);
+    JLabel ldraw = new JLabel("Draw", FontIcon.createIcon(FontAwesome.PICTURE_O, 14f), SwingConstants.LEFT);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 6;
@@ -522,7 +522,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
   }
   
   private void createAutoDelayPanel(Font labelfont) {
-    JLabel lborder = new JLabel("Auto Delay", IconFontSwing.buildIcon(FontAwesome.CLOCK_O, 14f), SwingConstants.LEFT);
+    JLabel lborder = new JLabel("Auto Delay", FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), SwingConstants.LEFT);
     GridBagConstraints c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 9;
