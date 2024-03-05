@@ -21,15 +21,13 @@ public class ShowRecordListAction extends AbstractPanelAction {
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_L == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isControlDown();
+        && p.getLastKeyEvents()[0].isAltDown()
+        && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditablePanel p) {
-    if(p.getSettings().isRecord()) {
-      p.getRecordActions().remove(p.getRecordActions().size() -1);
-      p.getRecordActions().remove(p.getRecordActions().size() -1);
-    }
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_L);
     p.getDialogRecords().showDialog();
   }
   

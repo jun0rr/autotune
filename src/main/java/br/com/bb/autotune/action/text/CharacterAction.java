@@ -21,7 +21,8 @@ public class CharacterAction extends AbstractTextAction {
   public boolean accept(EditablePanel p) {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[0] != null
-        && Autotune.CHAR_MAP.containsKey(p.getLastKeyEvents()[0].getKeyChar());
+        && Autotune.CHAR_MAP.containsKey(p.getLastKeyEvents()[0].getKeyChar())
+        && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override

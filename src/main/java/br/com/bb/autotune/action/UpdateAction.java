@@ -13,6 +13,8 @@ import java.awt.event.KeyEvent;
  */
 public class UpdateAction extends AbstractPanelAction {
   
+  public static final String SHORTCUT_REGEX = "key(Press|Release)\\(\\s?\\'.\\'\\=%d\\s?\\)";
+  
   public UpdateAction() {
     super("UpdateAction");
   }
@@ -21,24 +23,21 @@ public class UpdateAction extends AbstractPanelAction {
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_F5 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isAltDown();
+        && p.getLastKeyEvents()[0].isAltDown()
+        && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditablePanel p) {
-    if(p.getSettings().isRecord()) {
-      for(int i = p.getRecordActions().size() -1; i >= 0 && i >= p.getRecordActions().size() -5; i--) {
-        
-      }
-    }
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F5);
     p.getOwner().setVisible(false);
-    p.getAutotune().delay(100);
+    p.getAutotune().delay(150);
     p.getRecordActions().stream()
         .skip(p.getActionIndex().get())
         .peek(a->p.getActionIndex().incrementAndGet())
-        .peek(a->p.getAutotune().delay(10))
+        .peek(a->p.getAutotune().delay(30))
         .forEach(a->a.accept(p.getAutotune()));
-    p.getAutotune().delay(100);
+    p.getAutotune().delay(150);
     p.getBackgroundImage().set(
         p.getAutotune().takeScreenshot()
     );

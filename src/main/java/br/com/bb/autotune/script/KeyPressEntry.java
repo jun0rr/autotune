@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class KeyPressEntry implements RecordScriptEntry {
 
-  public static final String ENTRY_REGEX = "keyPress\\(\\s?\\'(.)\\'\\=([0-9]{1,10})\\s?\\)";
+  public static final String ENTRY_REGEX = "keyPress\\(\\s?\\'(.*)\\'\\=([0-9]{1,10})\\s?\\)";
   
   public static final Pattern ENTRY_PATTERN = Pattern.compile(ENTRY_REGEX);
   

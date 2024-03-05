@@ -23,7 +23,8 @@ public class CircumflexAction extends AbstractTextAction {
         && p.getLastKeyEvents()[2] != null 
         && p.getLastKeyEvents()[1] != null 
         && p.getLastKeyEvents()[2].getExtendedKeyCode() == 131 
-        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16;
+        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16
+        && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override

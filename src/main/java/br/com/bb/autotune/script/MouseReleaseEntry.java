@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class MouseReleaseEntry implements RecordScriptEntry {
 
-  public static final String ENTRY_REGEX = "mousePress\\(\\s?([0-9])\\s?\\)";
+  public static final String ENTRY_REGEX = "mouseRelease\\(\\s?([0-9])\\s?\\)";
   
   public static final Pattern ENTRY_PATTERN = Pattern.compile(ENTRY_REGEX);
   

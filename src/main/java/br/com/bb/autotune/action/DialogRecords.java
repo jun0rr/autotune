@@ -12,6 +12,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -26,7 +28,7 @@ import javax.swing.JScrollPane;
  *
  * @author F6036477
  */
-public class DialogRecords extends JDialog {
+public class DialogRecords extends JDialog implements KeyListener {
   
   private final JFrame owner;
   
@@ -39,6 +41,7 @@ public class DialogRecords extends JDialog {
     this.owner = Objects.requireNonNull(owner);
     this.records = Objects.requireNonNull(records);
     this.recordList = new JList();
+    recordList.addKeyListener(this);
     this.setLayout(new GridBagLayout());
     populate();
     pack();
@@ -58,6 +61,7 @@ public class DialogRecords extends JDialog {
     setRecordList(records);
     setLocation(x, y);
     setVisible(true);
+    recordList.requestFocus();
   }
   
   private void populate() {
@@ -118,5 +122,23 @@ public class DialogRecords extends JDialog {
     recordList.setListData(Objects.requireNonNull(ls).toArray());
     recordList.repaint();
   }
+
+  @Override 
+  public void keyPressed(KeyEvent e) {
+    if(KeyEvent.VK_A == e.getExtendedKeyCode() && e.isControlDown()) {
+      int idx[] = new int[records.size()];
+      for(int i = 0; i < idx.length; i++) {
+        idx[i] = i;
+      }
+      recordList.setSelectedIndices(idx);
+    }
+    else if(KeyEvent.VK_DELETE == e.getExtendedKeyCode()) {
+      removeSelectedRecords();
+    }
+  }
+  
+  @Override public void keyTyped(KeyEvent e) {}
+
+  @Override public void keyReleased(KeyEvent e) {}
   
 }

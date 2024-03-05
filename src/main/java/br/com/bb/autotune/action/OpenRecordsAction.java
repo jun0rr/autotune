@@ -5,14 +5,17 @@
 package br.com.bb.autotune.action;
 
 import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.script.RecordScript;
+import br.com.bb.autotune.script.RecordScriptEntry;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -21,27 +24,34 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author Juno
  */
-public class SaveRecordsAction extends AbstractPanelAction {
+public class OpenRecordsAction extends AbstractPanelAction {
   
-  public SaveRecordsAction() {
-    super("SaveRecords");
+  private final RecordScript rscript;
+  
+  public OpenRecordsAction() {
+    this(new RecordScript());
+  }
+  
+  public OpenRecordsAction(RecordScript rs) {
+    super("OpenRecords");
+    this.rscript = Objects.requireNonNull(rs);
   }
   
   @Override
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
-        && KeyEvent.VK_S == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && KeyEvent.VK_O == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
         && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditablePanel p) {
-    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_S);
-    save(p, p.getRecordActions());
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_O);
+    open(p, p.getRecordActions());
   }
   
-  public void save(Component owner, List<RecordAction> records) {
+  public void open(Component owner, List<RecordAction> records) {
     JFileChooser chooser = new JFileChooser();
     chooser.setFileFilter(new FileFilter() {
       @Override
@@ -55,19 +65,18 @@ public class SaveRecordsAction extends AbstractPanelAction {
     });
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setMultiSelectionEnabled(false);
-    int opt = chooser.showSaveDialog(owner);
+    int opt = chooser.showOpenDialog(owner);
     if(JFileChooser.APPROVE_OPTION == opt) {
       File f = chooser.getSelectedFile();
       try {
-        StringBuilder sb = new StringBuilder();
-        records.forEach(r->sb.append(r.getText()).append('\n'));
-        Files.writeString(f.toPath(), sb.toString(), 
-            StandardCharsets.UTF_8, 
-            StandardOpenOption.CREATE, 
-            StandardOpenOption.WRITE, 
-            StandardOpenOption.TRUNCATE_EXISTING
-        );
-        JOptionPane.showMessageDialog(owner, "Record Script saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        records.clear();
+        String script = Files.readString(f.toPath(), StandardCharsets.UTF_8);
+        records.addAll(rscript.parseScript(script));
+        if(records.isEmpty()) {
+          throw new IllegalStateException("No records found in script file: " + f.toString());
+        }
+        String msg = String.format("Record Script loaded successfully (%d lines)!", records.size());
+        JOptionPane.showMessageDialog(owner, msg, "Success", JOptionPane.INFORMATION_MESSAGE);
       }
       catch(IOException e) {
         JOptionPane.showMessageDialog(owner, e, "Error", JOptionPane.ERROR_MESSAGE);

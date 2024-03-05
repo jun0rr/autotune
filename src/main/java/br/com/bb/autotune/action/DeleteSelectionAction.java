@@ -6,7 +6,6 @@ package br.com.bb.autotune.action;
 
 import br.com.bb.autotune.EditablePanel;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.util.stream.Collectors;
 
 /**
@@ -23,14 +22,13 @@ public class DeleteSelectionAction extends AbstractPanelAction {
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_DELETE == p.getLastKeyEvents()[0].getKeyCode()
-        && p.getLastKeyEvents()[0].isControlDown();
+        && p.getLastKeyEvents()[0].isAltDown()
+        && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditablePanel p) {
-    if(p.getSettings().isRecord()) {
-      p.getRecordActions().remove(p.getRecordActions().size() -1);
-    }
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_DELETE);
     if(p.getSelectionShape().isPresent()) {
       p.getTextPoints().stream()
           .filter(t->p.getSelectionShape().get().getShape().contains(t.getPoint()))

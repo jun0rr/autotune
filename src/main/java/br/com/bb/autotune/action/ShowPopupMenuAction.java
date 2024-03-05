@@ -44,10 +44,9 @@ public class ShowPopupMenuAction extends AbstractPanelAction {
       Dimension dim = p.getSize();
       xy = new Point(loc.x + dim.width / 2, loc.y + dim.height / 2);
     }
-    if(p.getSettings().isRecord()) {
-      p.getRecordActions().remove(p.getRecordActions().size() -1);
-    }
     p.getPopupMenu().show(p, xy.x, xy.y);
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F1);
+    removeMouseClickRecords(p, MouseEvent.BUTTON3);
   }
   
 }

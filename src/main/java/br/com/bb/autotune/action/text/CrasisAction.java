@@ -22,7 +22,8 @@ public class CrasisAction extends AbstractTextAction {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[2] != null 
         && p.getLastKeyEvents()[2].getExtendedKeyCode() == 129 
-        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16;
+        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 16
+        && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override

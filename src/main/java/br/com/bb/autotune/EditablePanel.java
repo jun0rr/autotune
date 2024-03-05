@@ -9,12 +9,15 @@ import br.com.bb.autotune.action.DefaultRecordAction;
 import br.com.bb.autotune.action.DeleteSelectionAction;
 import br.com.bb.autotune.action.DialogRecords;
 import br.com.bb.autotune.action.FinishShapeDrawAction;
+import br.com.bb.autotune.action.OpenRecordsAction;
 import br.com.bb.autotune.action.PanelAction;
 import br.com.bb.autotune.action.RecordAction;
 import br.com.bb.autotune.action.SaveImageAction;
+import br.com.bb.autotune.action.SaveRecordsAction;
 import br.com.bb.autotune.action.SetCurrentTextAction;
 import br.com.bb.autotune.action.ShowPopupMenuAction;
 import br.com.bb.autotune.action.ShowRecordListAction;
+import br.com.bb.autotune.action.ToggleRecordAction;
 import br.com.bb.autotune.action.UpdateAction;
 import br.com.bb.autotune.action.shape.ArrowDownAction;
 import br.com.bb.autotune.action.shape.ArrowLeftAction;
@@ -106,6 +109,8 @@ public class EditablePanel extends JPanel implements
   
   private final JMenuItem drawItem;
   
+  private final JMenuItem irecord;
+  
   private final Reference<BufferedImage> background;
   
   private final Reference<TextPoint> currentText;
@@ -126,7 +131,11 @@ public class EditablePanel extends JPanel implements
   
   private final Dimension screenSize;
   
+  private final OpenRecordsAction openRecordsAction;
+  
   private final SaveImageAction saveImageAction;
+  
+  private final SaveRecordsAction saveRecordsAction;
   
   private final UpdateAction updateAction;
   
@@ -138,6 +147,7 @@ public class EditablePanel extends JPanel implements
     this.textPoints = new LinkedList();
     this.shapes = new LinkedList();
     this.drawItem = new JMenuItem("Draw");
+    this.irecord = new JMenuItem("Record (Alt+R)");
     this.popupMenu = createPopupMenu();
     this.settings = new Settings();
     settings.addListener(this);
@@ -150,16 +160,21 @@ public class EditablePanel extends JPanel implements
     this.actionIndex = new AtomicInteger(0);
     this.keyEvents = new KeyEvent[3];
     this.mouseEvents = new MouseEvent[3];
+    this.saveImageAction = new SaveImageAction();
+    this.saveRecordsAction = new SaveRecordsAction();
+    this.openRecordsAction = new OpenRecordsAction();
+    this.updateAction = new UpdateAction();
     this.panelActions = new LinkedList<>();
     this.panelActions.add(new CancelSelectionAction());
     this.panelActions.add(new DeleteSelectionAction());
     this.panelActions.add(new FinishShapeDrawAction());
-    this.saveImageAction = new SaveImageAction();
+    this.panelActions.add(openRecordsAction);
     this.panelActions.add(saveImageAction);
+    this.panelActions.add(saveRecordsAction);
     this.panelActions.add(new SetCurrentTextAction());
     this.panelActions.add(new ShowPopupMenuAction());
     this.panelActions.add(new ShowRecordListAction());
-    this.updateAction = new UpdateAction();
+    this.panelActions.add(new ToggleRecordAction());
     this.panelActions.add(updateAction);
     this.textActions = new ArrayList<>();
     this.textActions.add(new EnterAction());
@@ -306,10 +321,21 @@ public class EditablePanel extends JPanel implements
       case FONT:
         break;
       case RECORD:
+        toggleRecordItem();
         break;
       default:
         break;
     }
+  }
+  
+  private void toggleRecordItem() {
+    if(settings.isRecord()) {
+      irecord.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE, Color.RED, 12f));
+    }
+    else {
+      irecord.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
+    }
+    irecord.repaint();
   }
   
   private void toggleDrawItem() {
@@ -366,7 +392,7 @@ public class EditablePanel extends JPanel implements
     JMenuItem itype = new JMenuItem("Type Clipboard");
     itype.setIcon(FontIcon.createIcon(FontAwesome.KEYBOARD_O, 12f));
     itype.addActionListener(e->addRecordAction(
-        "typeClipboard", 
+        "typeClipboard()", 
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
         a->a.typeClipboard())
     );
@@ -374,7 +400,7 @@ public class EditablePanel extends JPanel implements
     actionsMenu.add(idelay);
     actionsMenu.add(itype);
     
-    JMenuItem isaveimg = new JMenuItem("Save Image (Alt+F3)");
+    JMenuItem isaveimg = new JMenuItem("Save Image (Alt+F2)");
     isaveimg.setIcon(FontIcon.createIcon(FontAwesome.FLOPPY_O, 12f));
     isaveimg.addActionListener(a->saveImageAction.perform(this));
     
@@ -398,18 +424,19 @@ public class EditablePanel extends JPanel implements
     drawItem.setIcon(FontIcon.createIcon(FontAwesome.PAINT_BRUSH, Settings.GREEN_DARKEN3.color(), 12f));
     drawItem.addActionListener(e->toggleDrawSettings());
     
-    JMenuItem irec = new JMenuItem("Record (Alt+R)");
-    irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
-    irec.addActionListener(e->{
-      settings.setRecord(!settings.isRecord());
-      if(settings.isRecord()) {
-        irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE, Color.RED, 12f));
-      }
-      else {
-        irec.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
-      }
-      irec.repaint();
+    JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
+    ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));
+    ilsrec.addActionListener(e->dialogrecs.showDialog());
+    
+    JMenuItem iopenrecs = new JMenuItem("Open Record Script (Alt+O)");
+    iopenrecs.setIcon(FontIcon.createIcon(FontAwesome.FOLDER_OPEN_O, 12f));
+    iopenrecs.addActionListener(e->{
+      openRecordsAction.open(EditablePanel.this, recordActions);
+      dialogrecs.showDialog();
     });
+    
+    irecord.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
+    irecord.addActionListener(e->settings.setRecord(!settings.isRecord()));
     
     JMenuItem iupdate = new JMenuItem("Update (Alt+F5)");
     iupdate.setIcon(FontIcon.createIcon(FontAwesome.REFRESH, 12f));
@@ -426,10 +453,6 @@ public class EditablePanel extends JPanel implements
       updateAction.perform(this);
     });
     
-    JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
-    ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));
-    ilsrec.addActionListener(e->dialogrecs.showDialog());
-    
     JMenuItem iexit = new JMenuItem("Exit");
     iexit.setIcon(FontIcon.createIcon(FontAwesome.SIGN_OUT, 12f));
     iexit.addActionListener(e->System.exit(0));
@@ -440,11 +463,12 @@ public class EditablePanel extends JPanel implements
     menu.add(isets);
     menu.add(shapesMenu);
     menu.add(drawItem);
-    menu.add(irec);
+    menu.add(ilsrec);
+    menu.add(iopenrecs);
+    menu.add(irecord);
     menu.add(iupdate);
     menu.add(irev);
     menu.add(iplay);
-    menu.add(ilsrec);
     menu.add(new JPopupMenu.Separator());
     menu.add(iexit);
     return menu;
@@ -571,7 +595,6 @@ public class EditablePanel extends JPanel implements
   
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
-    System.out.printf(">> action: mouseWheel( %d )%n", e.getWheelRotation());
     addRecordAction(a->a.mouseWheel(e.getWheelRotation()), 
         FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
         "mouseWheel( %d )", e.getWheelRotation()

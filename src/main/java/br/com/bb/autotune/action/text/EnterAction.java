@@ -20,7 +20,8 @@ public class EnterAction extends AbstractTextAction {
   @Override
   public boolean accept(EditablePanel p) {
     return p.getCurrentText().isPresent() 
-        && KeyEvent.VK_ENTER == p.getLastKeyEvents()[0].getKeyCode();
+        && KeyEvent.VK_ENTER == p.getLastKeyEvents()[0].getKeyCode()
+        && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override

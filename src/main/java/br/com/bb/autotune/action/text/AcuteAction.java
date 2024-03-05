@@ -21,7 +21,8 @@ public class AcuteAction extends AbstractTextAction {
   public boolean accept(EditablePanel p) {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[1] != null 
-        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 129;
+        && p.getLastKeyEvents()[1].getExtendedKeyCode() == 129
+        && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override

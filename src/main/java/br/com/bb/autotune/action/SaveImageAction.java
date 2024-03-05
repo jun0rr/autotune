@@ -27,12 +27,14 @@ public class SaveImageAction extends AbstractPanelAction {
   @Override
   public boolean accept(EditablePanel p) {
     return p.getLastKeyEvents()[0] != null
-        && KeyEvent.VK_F3 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
-        && p.getLastKeyEvents()[0].isControlDown();
+        && KeyEvent.VK_F2 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && p.getLastKeyEvents()[0].isAltDown()
+        && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditablePanel p) {
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F2);
     JFileChooser chooser = new JFileChooser();
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     chooser.setMultiSelectionEnabled(false);
