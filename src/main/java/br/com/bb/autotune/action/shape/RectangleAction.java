@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
 
@@ -19,12 +19,12 @@ public class RectangleAction extends AbstractShapeAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return DrawMode.RECTANGLE == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     p.getCurrentShape().set(new ShapeInfo(getOrigin(p.getLastMouseEvents()[0], p.getCurrentShape()), 
         getSize(p.getLastMouseEvents()[0], p.getCurrentShape()),
         p.getSettings().getDrawSettings().getStroke(),

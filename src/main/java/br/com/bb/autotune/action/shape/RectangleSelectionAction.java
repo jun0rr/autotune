@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
 import java.awt.BasicStroke;
@@ -22,12 +22,12 @@ public class RectangleSelectionAction extends AbstractShapeAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return DrawMode.NONE == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     Point origin = getOrigin(p.getLastMouseEvents()[0], p.getSelectionShape());
     Rectangle rect;
     if(p.getSelectionShape().isEmpty()) {

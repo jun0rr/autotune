@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -24,7 +24,7 @@ public abstract class AbstractPanelAction implements PanelAction {
     this.name = Objects.requireNonNull(name);
   }
   
-  public void removeShortcutRecords(EditablePanel p, int ... keys) {
+  public void removeShortcutRecords(EditorPanel p, int ... keys) {
     if(p.getSettings().isRecord()) {
       for(int i = p.getRecordActions().size() -1; i >= 0 && i >= p.getRecordActions().size() -5; i--) {
         RecordAction r = p.getRecordActions().get(i);
@@ -39,7 +39,7 @@ public abstract class AbstractPanelAction implements PanelAction {
     }
   }
   
-  public void removeMouseClickRecords(EditablePanel p, int ... buttons) {
+  public void removeMouseClickRecords(EditorPanel p, int ... buttons) {
     if(p.getSettings().isRecord()) {
       for(int i = p.getRecordActions().size() -1; i >= 0 && i >= p.getRecordActions().size() -5; i--) {
         RecordAction r = p.getRecordActions().get(i);

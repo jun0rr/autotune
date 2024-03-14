@@ -5,7 +5,7 @@
 package br.com.bb.autotune.test;
 
 import br.com.bb.autotune.Autotune;
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -42,7 +42,7 @@ public class TestJTextFieldBackground {
       //f.setUndecorated(true);
       GraphicsDevice device = GraphicsEnvironment
         .getLocalGraphicsEnvironment().getScreenDevices()[0];
-      EditablePanel a = new EditablePanel(f, auto);
+      EditorPanel a = new EditorPanel(f, auto);
       //a.setSize(280, 130);
       //a.setLocation(10, 10);
       //f.setLayout(null); 915 x 1056
@@ -50,7 +50,6 @@ public class TestJTextFieldBackground {
       CountDownLatch cd = new  CountDownLatch(1);
       f.addWindowListener(new WindowAdapter() {
         @Override public void windowClosing(WindowEvent e) {
-          System.out.printf("* windowClosing( %s )%n", e);
           cd.countDown();
         }
       });

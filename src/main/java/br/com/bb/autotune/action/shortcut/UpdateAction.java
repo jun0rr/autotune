@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package br.com.bb.autotune.action;
+package br.com.bb.autotune.action.shortcut;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
+import br.com.bb.autotune.action.AbstractPanelAction;
 import java.awt.event.KeyEvent;
 
 /**
@@ -20,7 +21,7 @@ public class UpdateAction extends AbstractPanelAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_F5 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
@@ -28,7 +29,7 @@ public class UpdateAction extends AbstractPanelAction {
   }
   
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F5);
     p.getOwner().setVisible(false);
     p.getAutotune().delay(150);

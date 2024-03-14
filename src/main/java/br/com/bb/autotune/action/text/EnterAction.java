@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action.text;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import java.awt.event.KeyEvent;
 
 /**
@@ -18,14 +18,14 @@ public class EnterAction extends AbstractTextAction {
   }
 
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getCurrentText().isPresent() 
         && KeyEvent.VK_ENTER == p.getLastKeyEvents()[0].getKeyCode()
         && !p.getLastKeyEvents()[0].isAltDown();
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     p.getCurrentText().get().text().append('\n');
   }
   

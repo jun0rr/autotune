@@ -68,6 +68,16 @@ public class FontIcon {
     return bufImage;
   }
   
+  public static Image createImage(FontAwesome icon, Color color, float size) {
+    checkFont();
+    return createImage(iconFont, icon, color, size);
+  }
+  
+  public static Image createImage(FontAwesome icon, float size) {
+    checkFont();
+    return createImage(iconFont, icon, Color.BLACK, size);
+  }
+  
   public static Icon createIcon(Font font, FontAwesome icon, Color color, float size) {
     return new ImageIcon(createImage(font, icon, color, size));
   }

@@ -5,7 +5,7 @@
 package br.com.bb.autotune.action.text;
 
 import br.com.bb.autotune.Autotune;
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 
 /**
  *
@@ -18,7 +18,7 @@ public class CrasisAction extends AbstractTextAction {
   }
 
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[2] != null 
         && p.getLastKeyEvents()[2].getExtendedKeyCode() == 129 
@@ -27,7 +27,7 @@ public class CrasisAction extends AbstractTextAction {
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     int code = (mod(p.getLastKeyEvents()[2]) * p.getLastKeyEvents()[2].getExtendedKeyCode() -1) 
         * mod(p.getLastKeyEvents()[0]) * p.getLastKeyEvents()[0].getExtendedKeyCode();
     if(Autotune.KEYCODES_MAP.containsKey(code)) {

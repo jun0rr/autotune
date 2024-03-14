@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 
 /**
  *
@@ -14,8 +14,8 @@ public interface PanelAction {
   
   public String getName();
   
-  public boolean accept(EditablePanel p);
+  public boolean accept(EditorPanel p);
   
-  public void perform(EditablePanel p);
+  public void perform(EditorPanel p);
   
 }

@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.TextPoint;
 import java.awt.event.MouseEvent;
 
@@ -19,14 +19,14 @@ public class SetCurrentTextAction extends AbstractPanelAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getLastMouseEvents()[0] != null
         && MouseEvent.MOUSE_CLICKED == p.getLastMouseEvents()[0].getID()
         && MouseEvent.BUTTON1 == p.getLastMouseEvents()[0].getButton();
   }
   
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     p.getCurrentText().set(new TextPoint(p.getLastMouseEvents()[0].getPoint(), p.getSettings().getFont(), p.getSettings().getCurrentColor().color()));
     p.getTextPoints().add(p.getCurrentText().get());
   }

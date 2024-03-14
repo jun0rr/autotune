@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
 import br.com.bb.autotune.settings.Settings;
@@ -23,12 +23,12 @@ public class ArrowLeftAction extends AbstractShapeAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return DrawMode.ARROW_LEFT == p.getSettings().getDrawSettings().getDrawMode();
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     Point origin = getOrigin(p.getLastMouseEvents()[0], p.getCurrentShape());
     Rectangle size = getSize(p.getLastMouseEvents()[0], p.getCurrentShape());
     Polygon b = new Polygon();

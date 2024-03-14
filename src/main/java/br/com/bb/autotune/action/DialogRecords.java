@@ -4,25 +4,32 @@
  */
 package br.com.bb.autotune.action;
 
+import br.com.bb.autotune.action.shortcut.SaveRecordsAction;
 import br.com.bb.autotune.icon.FontAwesome;
 import br.com.bb.autotune.icon.FontIcon;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -34,6 +41,8 @@ public class DialogRecords extends JDialog implements KeyListener {
   
   private final JList recordList;
   
+  private final JLabel infoLabel;
+  
   private final List<RecordAction> records;
   
   public DialogRecords(JFrame owner, List<RecordAction> records) {
@@ -41,6 +50,7 @@ public class DialogRecords extends JDialog implements KeyListener {
     this.owner = Objects.requireNonNull(owner);
     this.records = Objects.requireNonNull(records);
     this.recordList = new JList();
+    this.infoLabel = new JLabel(FontIcon.createIcon(FontAwesome.INFO_CIRCLE, Color.GRAY, 14f), SwingConstants.LEFT);
     recordList.addKeyListener(this);
     this.setLayout(new GridBagLayout());
     populate();
@@ -97,6 +107,16 @@ public class DialogRecords extends JDialog implements KeyListener {
         return this;
       }
     });
+    recordList.addListSelectionListener(e->{
+      int[] idx = recordList.getSelectedIndices();
+      if(idx.length > 0) {
+        infoLabel.setText(String.format(
+            "Count: %d | First: %d | Last: %d | Indices: %s", 
+            idx.length, idx[0], idx[idx.length-1], Arrays.toString(idx))
+        );
+        infoLabel.repaint();
+      }
+    });
     
     JScrollPane scroll = new JScrollPane(this.recordList);
     scroll.setPreferredSize(new Dimension(290, 350));
@@ -106,8 +126,21 @@ public class DialogRecords extends JDialog implements KeyListener {
     c.gridwidth = 2;
     c.gridheight = 6;
     c.anchor = GridBagConstraints.LINE_START;
-    c.insets = new Insets(5, 20, 10, 20);
+    c.insets = new Insets(5, 20, 5, 20);
     add(scroll, c);
+    
+    infoLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
+    infoLabel.setForeground(Color.GRAY);
+    infoLabel.setPreferredSize(new Dimension(290, 25));
+    infoLabel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+    c = new GridBagConstraints();
+    c.gridx = 0;
+    c.gridy = 7;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    c.insets = new Insets(5, 20, 10, 20);
+    add(infoLabel, c);
   }
   
   public void removeSelectedRecords() {

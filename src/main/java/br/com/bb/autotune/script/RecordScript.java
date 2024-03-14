@@ -5,6 +5,7 @@
 package br.com.bb.autotune.script;
 
 import br.com.bb.autotune.action.RecordAction;
+import br.com.bb.autotune.script.fn.FnContext;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class RecordScript {
     entries.add(new MousePressEntry());
     entries.add(new MouseReleaseEntry());
     entries.add(new MouseWheelEntry());
+    entries.add(new RepeatEntry());
     entries.add(new TypeClipboardEntry());
   }
   

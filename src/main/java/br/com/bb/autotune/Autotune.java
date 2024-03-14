@@ -4,9 +4,9 @@
 
 package br.com.bb.autotune;
 
+import br.com.bb.autotune.action.RecordAction;
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -22,7 +22,10 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 
@@ -36,14 +39,17 @@ public class Autotune {
   
   public static final Map<Integer,Character> KEYCODES_MAP = createKeyCodesMap();
   
+  private final List<RecordAction> records;
+  
   private final Robot robot;
   
   private final Random rand;
   
   private final Clipboard clip;
   
-  public Autotune() {
+  public Autotune(List<RecordAction> recs) {
     this.rand = new Random();
+    this.records = Objects.requireNonNull(recs);
     try {
       this.robot = new Robot();
       this.clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -53,14 +59,23 @@ public class Autotune {
     }
   }
   
+  public Autotune() {
+    this(new LinkedList<>());
+  }
+  
+  public List<RecordAction> getActionList() {
+    return records;
+  }
+  
   public Autotune delay() {
     robot.delay(rand.nextInt(50, 100));
     return this;
   }
   
   public Autotune delay(int millis) {
-    double plus = millis * 0.3;
-    robot.delay(rand.nextInt(50, Math.max((int)plus, 100)) + millis);
+    float plusMin = millis * 0.1f;
+    float plusMax = millis * 0.3f;
+    robot.delay(rand.nextInt(Math.round(plusMin), Math.round(plusMax)) + millis);
     return this;
   }
   
@@ -72,7 +87,7 @@ public class Autotune {
         c = CHAR_MAP.get(' ');
       }
       c.accept(this);
-      robot.delay(rand.nextInt(50, 100));
+      robot.delay(160);
     }
     return this;
   }
@@ -90,7 +105,7 @@ public class Autotune {
         robot.keyPress(keys[i]);
       }
     }
-    robot.delay(10);
+    robot.delay(rand.nextInt(20, 80));
     for(int i = keys.length -1; i > release; i--) {
       robot.keyRelease(keys[i]);
     }

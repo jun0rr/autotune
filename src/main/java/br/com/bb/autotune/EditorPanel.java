@@ -6,19 +6,20 @@ package br.com.bb.autotune;
 
 import br.com.bb.autotune.action.CancelSelectionAction;
 import br.com.bb.autotune.action.DefaultRecordAction;
-import br.com.bb.autotune.action.DeleteSelectionAction;
+import br.com.bb.autotune.action.shortcut.DeleteSelectionAction;
 import br.com.bb.autotune.action.DialogRecords;
 import br.com.bb.autotune.action.FinishShapeDrawAction;
-import br.com.bb.autotune.action.OpenRecordsAction;
+import br.com.bb.autotune.action.shortcut.OpenRecordsAction;
 import br.com.bb.autotune.action.PanelAction;
 import br.com.bb.autotune.action.RecordAction;
-import br.com.bb.autotune.action.SaveImageAction;
-import br.com.bb.autotune.action.SaveRecordsAction;
+import br.com.bb.autotune.action.RepeatRecordAction;
+import br.com.bb.autotune.action.shortcut.SaveImageAction;
+import br.com.bb.autotune.action.shortcut.SaveRecordsAction;
 import br.com.bb.autotune.action.SetCurrentTextAction;
-import br.com.bb.autotune.action.ShowPopupMenuAction;
-import br.com.bb.autotune.action.ShowRecordListAction;
-import br.com.bb.autotune.action.ToggleRecordAction;
-import br.com.bb.autotune.action.UpdateAction;
+import br.com.bb.autotune.action.shortcut.ShowPopupMenuAction;
+import br.com.bb.autotune.action.shortcut.ShowRecordListAction;
+import br.com.bb.autotune.action.shortcut.ToggleRecordAction;
+import br.com.bb.autotune.action.shortcut.UpdateAction;
 import br.com.bb.autotune.action.shape.ArrowDownAction;
 import br.com.bb.autotune.action.shape.ArrowLeftAction;
 import br.com.bb.autotune.action.shape.ArrowRightAction;
@@ -40,6 +41,7 @@ import br.com.bb.autotune.action.text.AbstractTextAction;
 import br.com.bb.autotune.action.text.TildeAction;
 import br.com.bb.autotune.icon.FontAwesome;
 import br.com.bb.autotune.icon.FontIcon;
+import br.com.bb.autotune.script.fn.FnContext;
 import br.com.bb.autotune.settings.DialogSettings;
 import br.com.bb.autotune.settings.DrawSettings;
 import br.com.bb.autotune.settings.DrawSettings.DrawMode;
@@ -55,6 +57,8 @@ import java.util.List;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -80,7 +84,7 @@ import javax.swing.JPopupMenu;
  *
  * @author F6036477
  */
-public class EditablePanel extends JPanel implements 
+public class EditorPanel extends JPanel implements 
     MouseListener, 
     MouseMotionListener, 
     MouseWheelListener, 
@@ -93,9 +97,15 @@ public class EditablePanel extends JPanel implements
   
   private final Settings settings;
   
+  private final FnContext fnCtx;
+  
   private final DialogSettings dialogsets;
   
   private final DialogRecords dialogrecs;
+  
+  private final DialogRepeat dialogrep;
+  
+  private final DialogFunction dialogfun;
   
   private final List<TextPoint> textPoints;
   
@@ -141,17 +151,19 @@ public class EditablePanel extends JPanel implements
   
   private float xmod, ymod;
   
-  public EditablePanel(JFrame owner, Autotune a) {
+  public EditorPanel(JFrame owner, Autotune a) {
     this.auto = Objects.requireNonNull(a);
     this.owner = Objects.requireNonNull(owner);
     this.textPoints = new LinkedList();
     this.shapes = new LinkedList();
     this.drawItem = new JMenuItem("Draw");
     this.irecord = new JMenuItem("Record (Alt+R)");
+    this.dialogrep = new DialogRepeat(owner);
+    this.dialogfun = new DialogFunction(owner, this);
     this.popupMenu = createPopupMenu();
     this.settings = new Settings();
     settings.addListener(this);
-    this.recordActions = new LinkedList<>();
+    this.recordActions = a.getActionList();
     this.dialogsets = new DialogSettings(owner, settings);
     this.dialogrecs = new DialogRecords(owner, recordActions);
     this.currentText = new Reference();
@@ -208,6 +220,7 @@ public class EditablePanel extends JPanel implements
     this.addMouseListener(this);
     this.addMouseMotionListener(this);
     this.addMouseWheelListener(this);
+    this.fnCtx = new FnContext(this);
   }
   
   public Settings getSettings() {
@@ -224,6 +237,10 @@ public class EditablePanel extends JPanel implements
   
   public JPopupMenu getPopupMenu() {
     return popupMenu;
+  }
+  
+  public FnContext getFnContext() {
+    return fnCtx;
   }
   
   public Autotune getAutotune() {
@@ -290,17 +307,17 @@ public class EditablePanel extends JPanel implements
     return screenSize;
   }
   
-  public EditablePanel addRecordAction(String text, Icon icon, Consumer<Autotune> c) {
+  public EditorPanel addRecordAction(String text, Icon icon, Consumer<Autotune> c) {
     if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, text));
     return this;
   }
   
-  public EditablePanel addRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object...args) {
+  public EditorPanel addRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object...args) {
     if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, fmt, args));
     return this;
   }
   
-  public EditablePanel addPanelAction(PanelAction a) {
+  public EditorPanel addPanelAction(PanelAction a) {
     panelActions.add(a);
     return this;
   }
@@ -396,9 +413,26 @@ public class EditablePanel extends JPanel implements
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
         a->a.typeClipboard())
     );
+    JMenuItem irepeat = new JMenuItem("Repeat");
+    irepeat.setIcon(FontIcon.createIcon(FontAwesome.REPEAT, 14f));
+    dialogrep.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentHidden(ComponentEvent e) {
+        if(dialogrep.getRepeat()[0] > 0 && dialogrep.getRepeat()[1] > 0) {
+          getRecordActions().add(new RepeatRecordAction(dialogrep.getRepeat()[0], dialogrep.getRepeat()[1]));
+        }
+      }
+    });
+    irepeat.addActionListener(e->dialogrep.showDialog());
+    
+    JMenuItem ifn = new JMenuItem("Custom Function");
+    ifn.setIcon(FontIcon.createIcon(FontAwesome.TERMINAL, 12f));
+    ifn.addActionListener(e->dialogfun.showDialog());
     actionsMenu.add(icopy);
     actionsMenu.add(idelay);
     actionsMenu.add(itype);
+    actionsMenu.add(irepeat);
+    actionsMenu.add(ifn);
     
     JMenuItem isaveimg = new JMenuItem("Save Image (Alt+F2)");
     isaveimg.setIcon(FontIcon.createIcon(FontAwesome.FLOPPY_O, 12f));
@@ -431,7 +465,7 @@ public class EditablePanel extends JPanel implements
     JMenuItem iopenrecs = new JMenuItem("Open Record Script (Alt+O)");
     iopenrecs.setIcon(FontIcon.createIcon(FontAwesome.FOLDER_OPEN_O, 12f));
     iopenrecs.addActionListener(e->{
-      openRecordsAction.open(EditablePanel.this, recordActions);
+      openRecordsAction.open(EditorPanel.this, recordActions);
       dialogrecs.showDialog();
     });
     

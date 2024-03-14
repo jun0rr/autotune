@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action.shape;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.Reference;
 import br.com.bb.autotune.ShapeInfo;
 import br.com.bb.autotune.action.PanelAction;
@@ -51,9 +51,9 @@ public abstract class AbstractShapeAction implements PanelAction {
     return new Rectangle(x, y, w, h);
   }
 
-  public abstract boolean accept(EditablePanel p);
+  public abstract boolean accept(EditorPanel p);
   
-  public abstract void perform(EditablePanel p);
+  public abstract void perform(EditorPanel p);
 
   @Override
   public int hashCode() {

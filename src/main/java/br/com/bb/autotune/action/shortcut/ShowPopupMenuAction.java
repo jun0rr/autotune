@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package br.com.bb.autotune.action;
+package br.com.bb.autotune.action.shortcut;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
+import br.com.bb.autotune.action.AbstractPanelAction;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
@@ -21,7 +22,7 @@ public class ShowPopupMenuAction extends AbstractPanelAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_F1 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
@@ -32,7 +33,7 @@ public class ShowPopupMenuAction extends AbstractPanelAction {
   }
   
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     Point xy;
     if(p.getLastMouseEvents()[0] != null
         && MouseEvent.BUTTON3 == p.getLastMouseEvents()[0].getButton()

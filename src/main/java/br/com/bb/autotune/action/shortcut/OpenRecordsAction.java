@@ -2,11 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package br.com.bb.autotune.action;
+package br.com.bb.autotune.action.shortcut;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
+import br.com.bb.autotune.action.AbstractPanelAction;
+import br.com.bb.autotune.action.RecordAction;
+import br.com.bb.autotune.script.FunctionEntry;
 import br.com.bb.autotune.script.RecordScript;
-import br.com.bb.autotune.script.RecordScriptEntry;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.io.File;
@@ -15,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -38,7 +39,7 @@ public class OpenRecordsAction extends AbstractPanelAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_O == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
@@ -46,8 +47,17 @@ public class OpenRecordsAction extends AbstractPanelAction {
   }
   
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_O);
+    boolean containsFnEntry = rscript.getScriptEntries()
+        .stream()
+        .map(x->x.getClass())
+        .filter(c->FunctionEntry.class == c)
+        .findAny()
+        .isPresent();
+    if(!containsFnEntry) {
+      rscript.getScriptEntries().add(new FunctionEntry(p.getFnContext()));
+    }
     open(p, p.getRecordActions());
   }
   

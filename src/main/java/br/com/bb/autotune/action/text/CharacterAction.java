@@ -5,7 +5,7 @@
 package br.com.bb.autotune.action.text;
 
 import br.com.bb.autotune.Autotune;
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
 
 /**
  *
@@ -18,7 +18,7 @@ public class CharacterAction extends AbstractTextAction {
   }
 
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     return p.getCurrentText().isPresent() 
         && p.getLastKeyEvents()[0] != null
         && Autotune.CHAR_MAP.containsKey(p.getLastKeyEvents()[0].getKeyChar())
@@ -26,7 +26,7 @@ public class CharacterAction extends AbstractTextAction {
   }
 
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     p.getCurrentText().get().text().append(p.getLastKeyEvents()[0].getKeyChar());
   }
 

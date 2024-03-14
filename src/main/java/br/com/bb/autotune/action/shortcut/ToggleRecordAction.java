@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package br.com.bb.autotune.action;
+package br.com.bb.autotune.action.shortcut;
 
-import br.com.bb.autotune.EditablePanel;
+import br.com.bb.autotune.EditorPanel;
+import br.com.bb.autotune.action.AbstractPanelAction;
 import java.awt.event.KeyEvent;
 
 /**
@@ -18,7 +19,7 @@ public class ToggleRecordAction extends AbstractPanelAction {
   }
   
   @Override
-  public boolean accept(EditablePanel p) {
+  public boolean accept(EditorPanel p) {
     //System.out.printf("* ToggleRecordAction.accept: keys[0]=(%s:%d, alt:%s), keys[1]=(%s:%d, alt:%s), keys[2]=(%s:%d, alt:%s)%n", 
         //p.getLastKeyEvents()[0] != null ? p.getLastKeyEvents()[0].getKeyChar() : null,
         //p.getLastKeyEvents()[0] != null ? p.getLastKeyEvents()[0].getKeyCode() : 0,
@@ -37,7 +38,7 @@ public class ToggleRecordAction extends AbstractPanelAction {
   }
   
   @Override
-  public void perform(EditablePanel p) {
+  public void perform(EditorPanel p) {
     removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_R);
     p.getSettings().setRecord(!p.getSettings().isRecord());
   }
