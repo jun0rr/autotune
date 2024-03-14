@@ -37,7 +37,7 @@ public class ShowPopupMenuAction extends AbstractPanelAction {
     Point xy;
     if(p.getLastMouseEvents()[0] != null
         && MouseEvent.BUTTON3 == p.getLastMouseEvents()[0].getButton()
-        && p.getLastMouseEvents()[0].isControlDown()) {
+        && p.getLastMouseEvents()[0].isAltDown()) {
       xy = p.getLastMouseEvents()[0].getPoint();
     }
     else {

@@ -22,6 +22,14 @@ public class UpdateAction extends AbstractPanelAction {
   
   @Override
   public boolean accept(EditorPanel p) {
+    //System.out.printf("* UpdateAction.accept(\n"
+        //+ "  - lastKeyEvents[0]=%s\n"
+        //+ "  - lastKeyEvents[1]=%s\n"
+        //+ "  - lastKeyEvents[2]=%s\n)\n", 
+        //p.getLastKeyEvents()[0], 
+        //p.getLastKeyEvents()[1], 
+        //p.getLastKeyEvents()[2]
+    //);
     return p.getLastKeyEvents()[0] != null
         && KeyEvent.VK_F5 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
@@ -37,7 +45,7 @@ public class UpdateAction extends AbstractPanelAction {
         .skip(p.getActionIndex().get())
         .peek(a->p.getActionIndex().incrementAndGet())
         .peek(a->p.getAutotune().delay(30))
-        .forEach(a->a.accept(p.getAutotune()));
+        .forEach(a->a.accept(p));
     p.getAutotune().delay(150);
     p.getBackgroundImage().set(
         p.getAutotune().takeScreenshot()

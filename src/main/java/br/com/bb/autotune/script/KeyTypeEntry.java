@@ -36,16 +36,16 @@ public class KeyTypeEntry implements RecordScriptEntry {
     int keyCode = Integer.parseInt(m.group(2));
     switch(keyCode) {
       case 0x2f:
-        return new DefaultRecordAction(Autotune.CHAR_MAP.get(keyChar), 
+        return new DefaultRecordAction(p->Autotune.CHAR_MAP.get(keyChar).accept(p.getAutotune()), 
             FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
       case 0x10000c7:
-        return new DefaultRecordAction(Autotune.CHAR_MAP.get(keyChar), 
+        return new DefaultRecordAction(p->Autotune.CHAR_MAP.get(keyChar).accept(p.getAutotune()), 
             FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
       default:
-        return new DefaultRecordAction(a->{
-            a.keyPress(keyCode);
-            a.delay();
-            a.keyRelease(keyCode);
+        return new DefaultRecordAction(p->{
+            p.getAutotune().keyPress(keyCode);
+            p.getAutotune().delay();
+            p.getAutotune().keyRelease(keyCode);
           }, FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
     }
   }

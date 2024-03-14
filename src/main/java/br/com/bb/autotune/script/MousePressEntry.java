@@ -31,7 +31,7 @@ public class MousePressEntry implements RecordScriptEntry {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int btn = Integer.parseInt(m.group(1));
-    return new DefaultRecordAction(a->a.mousePress(btn), 
+    return new DefaultRecordAction(p->p.getAutotune().mousePress(btn), 
         FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), s);
   }
 

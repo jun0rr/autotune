@@ -17,11 +17,11 @@ public class FnSource {
   
   private static final String CLASSPATH = "br.com.bb.autotune.script.fn.custom";
   
-  private static final String PACKAGE = String.format("package %s; ", CLASSPATH);
+  private static final String PACKAGE = String.format("package %s;\n", CLASSPATH);
   
-  private static final String IMPLEMENTS = "public class %s implements Fn { %s }";
+  private static final String IMPLEMENTS = "public class %s implements Fn {\n     %s\n}";
   
-  private static final String METHOD = "public void run(FnContext ctx) { %s }";
+  private static final String METHOD = "public void run(FnContext ctx) { %s }\n";
   
   private final List<Class> imports;
   
@@ -80,7 +80,7 @@ public class FnSource {
   public String toString() {
     StringBuilder sb = new StringBuilder(PACKAGE);
     imports.stream()
-        .map(c->String.format("import %s; ", c.getName()))
+        .map(c->String.format("import %s;\n", c.getName()))
         .forEach(s->sb.append(s));
     sb.append(String.format(
         IMPLEMENTS, name, 

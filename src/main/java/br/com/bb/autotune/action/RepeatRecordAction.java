@@ -4,7 +4,7 @@
  */
 package br.com.bb.autotune.action;
 
-import br.com.bb.autotune.Autotune;
+import br.com.bb.autotune.EditorPanel;
 import br.com.bb.autotune.icon.FontAwesome;
 import br.com.bb.autotune.icon.FontIcon;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,20 +46,20 @@ public class RepeatRecordAction implements RecordAction {
   }
 
   @Override
-  public void accept(Autotune a) {
+  public void accept(EditorPanel p) {
     String s = String.format("repeat%d( %d, %d )", id, lines, times);
-    int ridx = IntStream.range(0, a.getActionList().size())
-        .filter(i->a.getActionList().get(i).getText().equals(s))
+    int ridx = IntStream.range(0, p.getRecordActions().size())
+        .filter(i->p.getRecordActions().get(i).getText().equals(s))
         .findFirst()
         .getAsInt();
     int skip = ridx - lines;
     for(int i = 0; i < times; i++) {
-      a.getActionList().stream()
+      p.getRecordActions().stream()
           .skip(ridx - lines)
           .limit(lines)
-          .peek(r->a.delay(30))
-          .forEach(r->r.accept(a));
-      a.delay(150);
+          .peek(r->p.getAutotune().delay(30))
+          .forEach(r->r.accept(p));
+      p.getAutotune().delay(150);
     }
   }
   

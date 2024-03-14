@@ -32,7 +32,7 @@ public class KeyReleaseEntry implements RecordScriptEntry {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int keyCode = Integer.parseInt(m.group(2));
-    return new DefaultRecordAction(a->a.keyRelease(keyCode), 
+    return new DefaultRecordAction(p->p.getAutotune().keyRelease(keyCode), 
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
   }
 

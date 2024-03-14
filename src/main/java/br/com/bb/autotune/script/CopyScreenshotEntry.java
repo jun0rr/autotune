@@ -35,7 +35,7 @@ public class CopyScreenshotEntry implements RecordScriptEntry {
     int y = Integer.parseInt(m.group(2));
     int w = Integer.parseInt(m.group(3));
     int h = Integer.parseInt(m.group(4));
-    return new DefaultRecordAction(a->a.copyScreenshot(new Rectangle(x, y, w, h)), 
+    return new DefaultRecordAction(p->p.getAutotune().copyScreenshot(new Rectangle(x, y, w, h)), 
         FontIcon.createIcon(FontAwesome.CLONE, 14f), s);
   }
 

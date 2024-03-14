@@ -39,17 +39,14 @@ public class Autotune {
   
   public static final Map<Integer,Character> KEYCODES_MAP = createKeyCodesMap();
   
-  private final List<RecordAction> records;
-  
   private final Robot robot;
   
   private final Random rand;
   
   private final Clipboard clip;
   
-  public Autotune(List<RecordAction> recs) {
+  public Autotune() {
     this.rand = new Random();
-    this.records = Objects.requireNonNull(recs);
     try {
       this.robot = new Robot();
       this.clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -57,14 +54,6 @@ public class Autotune {
     catch(AWTException e) {
       throw new RuntimeException(e);
     }
-  }
-  
-  public Autotune() {
-    this(new LinkedList<>());
-  }
-  
-  public List<RecordAction> getActionList() {
-    return records;
   }
   
   public Autotune delay() {

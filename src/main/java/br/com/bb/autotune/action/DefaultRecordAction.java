@@ -5,6 +5,7 @@
 package br.com.bb.autotune.action;
 
 import br.com.bb.autotune.Autotune;
+import br.com.bb.autotune.EditorPanel;
 import java.util.Objects;
 import java.util.function.Consumer;
 import javax.swing.Icon;
@@ -19,9 +20,9 @@ public class DefaultRecordAction implements RecordAction {
   
   private final Icon icon;
   
-  private final Consumer<Autotune> action;
+  private final Consumer<EditorPanel> action;
   
-  public DefaultRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object... args) {
+  public DefaultRecordAction(Consumer<EditorPanel> c, Icon icon, String fmt, Object... args) {
     this.action = Objects.requireNonNull(c);
     this.icon = Objects.requireNonNull(icon);
     this.text = String.format(fmt, args);
@@ -38,7 +39,7 @@ public class DefaultRecordAction implements RecordAction {
   }
 
   @Override
-  public void accept(Autotune a) {
+  public void accept(EditorPanel a) {
     action.accept(a);
   }
 

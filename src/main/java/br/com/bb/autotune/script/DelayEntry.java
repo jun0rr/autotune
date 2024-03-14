@@ -31,7 +31,7 @@ public class DelayEntry implements RecordScriptEntry {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int delay = Integer.parseInt(m.group(1));
-    return new DefaultRecordAction(a->a.delay(delay), 
+    return new DefaultRecordAction(p->p.getAutotune().delay(delay), 
         FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), s);
   }
 

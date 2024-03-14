@@ -30,7 +30,7 @@ public class TypeClipboardEntry implements RecordScriptEntry {
   public RecordAction parse(String s) {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
-    return new DefaultRecordAction(a->a.typeClipboard(), 
+    return new DefaultRecordAction(p->p.getAutotune().typeClipboard(), 
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
   }
 

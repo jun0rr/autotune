@@ -31,7 +31,7 @@ public class KeyPressEntry implements RecordScriptEntry {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int keyCode = Integer.parseInt(m.group(2));
-    return new DefaultRecordAction(a->a.keyPress(keyCode), 
+    return new DefaultRecordAction(p->p.getAutotune().keyPress(keyCode), 
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), s);
   }
 

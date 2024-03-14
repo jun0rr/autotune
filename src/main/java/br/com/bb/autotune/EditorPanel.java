@@ -70,6 +70,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import javax.swing.Icon;
@@ -163,7 +164,7 @@ public class EditorPanel extends JPanel implements
     this.popupMenu = createPopupMenu();
     this.settings = new Settings();
     settings.addListener(this);
-    this.recordActions = a.getActionList();
+    this.recordActions = new CopyOnWriteArrayList();
     this.dialogsets = new DialogSettings(owner, settings);
     this.dialogrecs = new DialogRecords(owner, recordActions);
     this.currentText = new Reference();
@@ -307,12 +308,12 @@ public class EditorPanel extends JPanel implements
     return screenSize;
   }
   
-  public EditorPanel addRecordAction(String text, Icon icon, Consumer<Autotune> c) {
+  public EditorPanel addRecordAction(String text, Icon icon, Consumer<EditorPanel> c) {
     if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, text));
     return this;
   }
   
-  public EditorPanel addRecordAction(Consumer<Autotune> c, Icon icon, String fmt, Object...args) {
+  public EditorPanel addRecordAction(Consumer<EditorPanel> c, Icon icon, String fmt, Object...args) {
     if(settings.isRecord()) recordActions.add(new DefaultRecordAction(c, icon, fmt, args));
     return this;
   }
@@ -384,7 +385,7 @@ public class EditorPanel extends JPanel implements
     else {
       r = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
     }
-    addRecordAction(a->a.copyScreenshot(r), 
+    addRecordAction(p->p.getAutotune().copyScreenshot(r), 
         FontIcon.createIcon(FontAwesome.PICTURE_O, 14f), 
         "copyScreenshot( %d, %d, %d, %d )", 
         r.x, r.y, r.width, r.height
@@ -402,7 +403,7 @@ public class EditorPanel extends JPanel implements
     JMenuItem idelay = new JMenuItem("Delay");
     idelay.setIcon(FontIcon.createIcon(FontAwesome.CLOCK_O, 12f));
     idelay.addActionListener(e->addRecordAction(
-        a->a.delay(settings.getAutoDelay()), 
+        p->p.getAutotune().delay(settings.getAutoDelay()), 
         FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), 
         "delay( %d )", settings.getAutoDelay())
     );
@@ -411,7 +412,7 @@ public class EditorPanel extends JPanel implements
     itype.addActionListener(e->addRecordAction(
         "typeClipboard()", 
         FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
-        a->a.typeClipboard())
+        p->p.getAutotune().typeClipboard())
     );
     JMenuItem irepeat = new JMenuItem("Repeat");
     irepeat.setIcon(FontIcon.createIcon(FontAwesome.REPEAT, 14f));
@@ -629,7 +630,7 @@ public class EditorPanel extends JPanel implements
   
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
-    addRecordAction(a->a.mouseWheel(e.getWheelRotation()), 
+    addRecordAction(p->p.getAutotune().mouseWheel(e.getWheelRotation()), 
         FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
         "mouseWheel( %d )", e.getWheelRotation()
     );
@@ -645,21 +646,21 @@ public class EditorPanel extends JPanel implements
     Point mod = modPoint(e.getPoint());
     switch(e.getID()) {
       case MouseEvent.MOUSE_PRESSED:
-        addRecordAction(a->a.mouseMove(mod), 
+        addRecordAction(p->p.getAutotune().mouseMove(mod), 
             FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseMove( %d, %d )", mod.x, mod.y
         );
-        addRecordAction(a->a.mousePress(e.getButton()), 
+        addRecordAction(p->p.getAutotune().mousePress(e.getButton()), 
             FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mousePress( %d )", e.getButton()
         );
         break;
       case MouseEvent.MOUSE_RELEASED:
-        addRecordAction(a->a.mouseMove(mod), 
+        addRecordAction(p->p.getAutotune().mouseMove(mod), 
             FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseMove( %d, %d )", mod.x, mod.y
         );
-        addRecordAction(a->a.mouseRelease(e.getButton()), 
+        addRecordAction(p->p.getAutotune().mouseRelease(e.getButton()), 
             FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), 
             "mouseRelease( %d )", e.getButton()
         );
@@ -674,7 +675,7 @@ public class EditorPanel extends JPanel implements
       case 0x2f:
         if(KeyEvent.KEY_PRESSED == e.getID()) {
           char c = e.isShiftDown() ? '?' : '/';
-          addRecordAction(Autotune.CHAR_MAP.get(c), 
+          addRecordAction(p->Autotune.CHAR_MAP.get(c).accept(p.getAutotune()), 
               FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyType( '%s'=%d )", c, e.getExtendedKeyCode()
           );
@@ -683,7 +684,7 @@ public class EditorPanel extends JPanel implements
       case 0x10000c7:
         if(KeyEvent.KEY_PRESSED == e.getID()) {
           char c = e.isShiftDown() || Character.isUpperCase(e.getKeyChar()) ? 'Ç' : 'ç';
-          addRecordAction(Autotune.CHAR_MAP.get(c), 
+          addRecordAction(p->Autotune.CHAR_MAP.get(c).accept(p.getAutotune()), 
               FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyType( '%s'=%d )", c, e.getExtendedKeyCode()
           );
@@ -691,14 +692,14 @@ public class EditorPanel extends JPanel implements
         break;
       default:
         if(KeyEvent.KEY_PRESSED == e.getID()) {
-          addRecordAction(a->a.keydo(e), 
+          addRecordAction(p->p.getAutotune().keydo(e), 
               FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyPress( '%s'=%d )", 
               e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()
           );
         }
         else {
-          addRecordAction(a->a.keydo(e), 
+          addRecordAction(p->p.getAutotune().keydo(e), 
               FontIcon.createIcon(FontAwesome.KEYBOARD_O, 14f), 
               "keyRelease( '%s'=%d )", 
               e.getKeyCode() == 10 ? "\\n" : e.getKeyChar(), e.getExtendedKeyCode()

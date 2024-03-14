@@ -87,6 +87,9 @@ public class FnContext {
         fnmap.put(src.getName(), fn);
         return fn;
       }
+      catch(RuntimeException r) {
+        throw r;
+      }
       catch(Exception e) {
         throw new RuntimeException(e);
       }

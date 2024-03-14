@@ -17,9 +17,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -80,8 +84,8 @@ public class DialogFunction extends JDialog {
     c.insets = new Insets(10, 20, 5, 20);
     add(label, c);
     
-    iname.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-    iname.setPreferredSize(new Dimension(250, 25));
+    iname.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+    iname.setBackground(new Color(60, 63, 65));
     c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 1;
@@ -102,24 +106,46 @@ public class DialogFunction extends JDialog {
     c.insets = new Insets(0, 20, 5, 20);
     add(label, c);
     
-    icode.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
-    JScrollPane scroll = new JScrollPane(icode);
-    scroll.setPreferredSize(new Dimension(250, 250));
+    JLabel fnStart = new JLabel("public void run( FnContext ctx ) {");
+    fnStart.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
     c = new GridBagConstraints();
     c.gridx = 0;
     c.gridy = 3;
     c.gridwidth = 2;
-    c.gridheight = 4;
+    c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_START;
-    c.insets = new Insets(0, 20, 10, 20);
+    c.insets = new Insets(0, 20, 5, 20);
+    add(fnStart, c);
+    
+    icode.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+    JScrollPane scroll = new JScrollPane(icode);
+    scroll.setPreferredSize(new Dimension(300, 200));
+    c = new GridBagConstraints();
+    c.gridx = 0;
+    c.gridy = 4;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    c.insets = new Insets(0, 20, 0, 20);
     add(scroll, c);
+    
+    JLabel fnEnd = new JLabel("}");
+    fnEnd.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+    c = new GridBagConstraints();
+    c.gridx = 0;
+    c.gridy = 5;
+    c.gridwidth = 2;
+    c.gridheight = 1;
+    c.anchor = GridBagConstraints.LINE_START;
+    c.insets = new Insets(5, 20, 10, 20);
+    add(fnEnd, c);
     
     JPanel sep = new JPanel();
     sep.setBackground(Color.GRAY);
-    sep.setPreferredSize(new Dimension(250, 1));
+    sep.setPreferredSize(new Dimension(300, 1));
     c = new GridBagConstraints();
     c.gridx = 0;
-    c.gridy = 7;
+    c.gridy = 6;
     c.gridwidth = 2;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.CENTER;
@@ -132,7 +158,7 @@ public class DialogFunction extends JDialog {
     });
     c = new GridBagConstraints();
     c.gridx = 0;
-    c.gridy = 8;
+    c.gridy = 7;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_END;
     c.insets = new Insets(10, 20, 10, 10);
@@ -142,18 +168,49 @@ public class DialogFunction extends JDialog {
     ok.addActionListener(e->{
       String name = iname.getText();
       String code = icode.getText();
-      if(name != null && !name.trim().isEmpty() && code != null && !code.trim().isEmpty()) {
+      if(name == null || name.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(DialogFunction.this, 
+            "Function name cannot be null", 
+            "Bad Function Name", 
+            JOptionPane.ERROR_MESSAGE
+        );
+        return;
+      }
+      if(code == null || code.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(DialogFunction.this, 
+            "Function code cannot be null", 
+            "Bad Function Code", 
+            JOptionPane.ERROR_MESSAGE
+        );
+        return;
+      }
+      try  {
         Fn fn = panel.getFnContext().createFunction(new FnSource(name.toLowerCase(), code));
         panel.addRecordAction(String.format("function %s() { %s }", name.toLowerCase(), code), 
             FontIcon.createIcon(FontAwesome.TERMINAL, 12f), 
             a->fn.run(panel.getFnContext())
         );
+        DialogFunction.this.setVisible(false);
       }
-      DialogFunction.this.setVisible(false);
+      catch(RuntimeException r) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(os);
+        r.printStackTrace(ps);
+        JTextArea st = new JTextArea(os.toString(StandardCharsets.UTF_8));
+        st.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+        st.setEditable(false);
+        //st.setForeground(new Color(213, 217, 127));
+        //st.setForeground(new Color(26, 184, 255));
+        st.setForeground(Color.decode("#81d4fa"));
+        st.setBackground(new Color(60, 63, 65));
+        JScrollPane sc = new JScrollPane(st);
+        sc.setPreferredSize(new Dimension(800, 400));
+        JOptionPane.showMessageDialog(DialogFunction.this, sc, "Compilation Error", JOptionPane.ERROR_MESSAGE);
+      }
     });
     c = new GridBagConstraints();
     c.gridx = 1;
-    c.gridy = 8;
+    c.gridy = 7;
     c.gridheight = 1;
     c.anchor = GridBagConstraints.LINE_END;
     c.insets = new Insets(10, 10, 10, 20);

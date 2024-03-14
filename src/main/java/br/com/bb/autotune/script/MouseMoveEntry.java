@@ -32,7 +32,7 @@ public class MouseMoveEntry implements RecordScriptEntry {
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int x = Integer.parseInt(m.group(1));
     int y = Integer.parseInt(m.group(2));
-    return new DefaultRecordAction(a->a.mouseMove(x, y), 
+    return new DefaultRecordAction(p->p.getAutotune().mouseMove(x, y), 
         FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), s);
   }
 

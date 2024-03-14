@@ -6,6 +6,7 @@ package br.com.bb.autotune.test;
 
 import br.com.bb.autotune.Autotune;
 import br.com.bb.autotune.EditorPanel;
+import br.com.bb.autotune.script.fn.FnContext;
 import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,13 +41,9 @@ public class TestJTextFieldBackground {
       catch(IOException e) {
         throw new RuntimeException(e);
       }
-      //f.setUndecorated(true);
-      GraphicsDevice device = GraphicsEnvironment
-        .getLocalGraphicsEnvironment().getScreenDevices()[0];
+      //FnContext ctx = null;
+      //javax.swing.JOptionPane.showMessageDialog(ctx.getEditorPanel(), "Alert Test!");
       EditorPanel a = new EditorPanel(f, auto);
-      //a.setSize(280, 130);
-      //a.setLocation(10, 10);
-      //f.setLayout(null); 915 x 1056
       f.add(a);
       CountDownLatch cd = new  CountDownLatch(1);
       f.addWindowListener(new WindowAdapter() {
@@ -55,7 +53,6 @@ public class TestJTextFieldBackground {
       });
       f.setVisible(true);
       f.setExtendedState(Frame.MAXIMIZED_BOTH);
-      //device.setFullScreenWindow(f);
       f.requestFocus();
       a.requestFocus();
       cd.await();

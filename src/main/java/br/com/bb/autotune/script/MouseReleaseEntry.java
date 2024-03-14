@@ -31,7 +31,7 @@ public class MouseReleaseEntry implements RecordScriptEntry {
     Matcher m = ENTRY_PATTERN.matcher(s);
     if(!m.matches()) throw new IllegalArgumentException("Cannot parse entry: " + s);
     int btn = Integer.parseInt(m.group(1));
-    return new DefaultRecordAction(a->a.mouseRelease(btn), 
+    return new DefaultRecordAction(p->p.getAutotune().mouseRelease(btn), 
         FontIcon.createIcon(FontAwesome.MOUSE_POINTER, 14f), s);
   }
 
