@@ -6,18 +6,15 @@ package br.com.bb.autotune.test;
 
 import br.com.bb.autotune.Autotune;
 import br.com.bb.autotune.EditorPanel;
-import br.com.bb.autotune.script.fn.FnContext;
+import br.com.bb.autotune.icon.FontAwesome;
+import br.com.bb.autotune.icon.FontIcon;
+import java.awt.Color;
 import java.awt.Frame;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -34,13 +31,9 @@ public class TestJTextFieldBackground {
       Autotune auto = new Autotune();
       JFrame f = new JFrame();
       f.setTitle("Autotune");
-      try {
-        Image icon = ImageIO.read(getClass().getResourceAsStream(FRAME_ICON_PATH));
-        f.setIconImage(icon);
-      }
-      catch(IOException e) {
-        throw new RuntimeException(e);
-      }
+      //Image icon = ImageIO.read(getClass().getResourceAsStream(FRAME_ICON_PATH));
+      Image icon = FontIcon.createImage(FontAwesome.BOLT, Color.decode("#1e88e5"), 30f);
+      f.setIconImage(icon);
       //FnContext ctx = null;
       //javax.swing.JOptionPane.showMessageDialog(ctx.getEditorPanel(), "Alert Test!");
       EditorPanel a = new EditorPanel(f, auto);
