@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class FunctionEntry implements RecordScriptEntry {
 
-  public static final String ENTRY_REGEX = "function\\s([a-z_]+)\\(\\)\\s\\{\\s?(.+)\\s?\\}";
+  public static final String ENTRY_REGEX = "fun\\s([a-z_]+)\\(\\)\\s\\{\\s?(.+)\\s?\\}";
   
   public static final Pattern ENTRY_PATTERN = Pattern.compile(ENTRY_REGEX);
   
@@ -47,7 +47,7 @@ public class FunctionEntry implements RecordScriptEntry {
         : fnCtx.createFunction(new FnSource(name, code));
     return new DefaultRecordAction(a->fn.run(fnCtx), 
         FontIcon.createIcon(FontAwesome.TERMINAL, 12f), 
-        "function %s() { %s }", name, code
+        "fun %s() { %s }", name, code
     );
   }
 
