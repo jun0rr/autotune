@@ -20,7 +20,7 @@ public class Settings {
   
   public static final ColorInfo BLUE_DARKEN3 = new ColorInfo(Color.decode("#1565c0"), "Blue", 0);
   
-  public static final ColorInfo LIGHT_BLUE_DARKEN3 = new ColorInfo(Color.decode("#0277bd"), "Light Blue", 1);
+  public static final ColorInfo LIGHT_BLUE_DARKEN3 = new ColorInfo(Color.decode("#2196f3"), "Light Blue", 1);
   
   public static final ColorInfo CYAN_DARKEN3 = new ColorInfo(Color.decode("#00838f"), "Cyan", 2);
   

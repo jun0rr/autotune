@@ -44,8 +44,6 @@ import javax.swing.SwingConstants;
  */
 public class DialogSettings extends JDialog implements Consumer<SettingsChangeEvent> {
   
-  public static final String ICON_PATH = "/gear.png";
-  
   public static final Object[] SHAPE_OPTIONS = {
     new JLabel("None", FontIcon.createIcon(FontAwesome.BAN, 12f), SwingConstants.LEFT),
     new JLabel("Line", FontIcon.createIcon(FontAwesome.MINUS, 12f), SwingConstants.LEFT),
@@ -88,13 +86,7 @@ public class DialogSettings extends JDialog implements Consumer<SettingsChangeEv
     this.currentColor = new JTextField(settings.getCurrentColor().colorHex());
     this.shapeCombo = new JComboBox(SHAPE_OPTIONS);
     this.lastColors = new ArrayList<>(4);
-    try {
-      Image icon = ImageIO.read(getClass().getResourceAsStream(ICON_PATH));
-      setIconImage(icon);
-    }
-    catch(IOException e) {
-      throw new RuntimeException(e);
-    }
+    setIconImage(FontIcon.createImage(FontAwesome.COG, 24f));
     GridBagLayout grid = new GridBagLayout();
     setLayout(grid);
     populate();
