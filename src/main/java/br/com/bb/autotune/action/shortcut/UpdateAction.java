@@ -14,8 +14,6 @@ import java.awt.event.KeyEvent;
  */
 public class UpdateAction extends AbstractPanelAction {
   
-  public static final String SHORTCUT_REGEX = "key(Press|Release)\\(\\s?\\'.\\'\\=%d\\s?\\)";
-  
   public UpdateAction() {
     super("UpdateAction");
   }
@@ -40,13 +38,12 @@ public class UpdateAction extends AbstractPanelAction {
   public void perform(EditorPanel p) {
     removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F5);
     p.getOwner().setVisible(false);
-    p.getAutotune().delay(150);
+    p.getAutotune().delay(200);
     p.getRecordActions().stream()
         .skip(p.getActionIndex().get())
         .peek(a->p.getActionIndex().incrementAndGet())
         .peek(a->p.getAutotune().delay(30))
         .forEach(a->a.accept(p));
-    p.getAutotune().delay(150);
     p.getBackgroundImage().set(
         p.getAutotune().takeScreenshot()
     );

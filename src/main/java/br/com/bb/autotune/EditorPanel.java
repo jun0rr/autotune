@@ -323,6 +323,15 @@ public class EditorPanel extends JPanel implements
     return this;
   }
   
+  public void updateBackground() {
+    owner.setVisible(false);
+    auto.delay(200);
+    background.set(auto.takeScreenshot());
+    owner.setVisible(true);
+    repaint();
+  }
+  
+  @Override
   public void accept(SettingsChangeEvent e) {
     switch(e) {
       case COLOR:
@@ -494,16 +503,17 @@ public class EditorPanel extends JPanel implements
     
     menu.add(actionsMenu);
     menu.add(new JPopupMenu.Separator());
-    menu.add(isaveimg);
     menu.add(isets);
+    menu.add(isaveimg);
     menu.add(shapesMenu);
     menu.add(drawItem);
-    menu.add(ilsrec);
-    menu.add(iopenrecs);
+    menu.add(new JPopupMenu.Separator());
     menu.add(irecord);
     menu.add(iupdate);
     menu.add(irev);
     menu.add(iplay);
+    menu.add(ilsrec);
+    menu.add(iopenrecs);
     menu.add(new JPopupMenu.Separator());
     menu.add(iexit);
     return menu;
