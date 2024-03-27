@@ -30,6 +30,7 @@ import br.com.bb.autotune.action.shape.LineAction;
 import br.com.bb.autotune.action.shape.RectangleAction;
 import br.com.bb.autotune.action.shape.RectangleSelectionAction;
 import br.com.bb.autotune.action.shape.TriangleAction;
+import br.com.bb.autotune.action.shortcut.TakeScreenshotAction;
 import br.com.bb.autotune.action.text.AcuteAction;
 import br.com.bb.autotune.action.text.BackspaceAction;
 import br.com.bb.autotune.action.text.CircumflexAction;
@@ -78,6 +79,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
@@ -188,6 +190,7 @@ public class EditorPanel extends JPanel implements
     this.panelActions.add(new ShowPopupMenuAction());
     this.panelActions.add(new ShowRecordListAction());
     this.panelActions.add(new ToggleRecordAction());
+    this.panelActions.add(new TakeScreenshotAction());
     this.panelActions.add(updateAction);
     this.textActions = new ArrayList<>();
     this.textActions.add(new EnterAction());
@@ -411,11 +414,18 @@ public class EditorPanel extends JPanel implements
     icopy.addActionListener(e->copyScreenshotRecord());
     JMenuItem idelay = new JMenuItem("Delay");
     idelay.setIcon(FontIcon.createIcon(FontAwesome.CLOCK_O, 12f));
-    idelay.addActionListener(e->addRecordAction(
-        p->p.getAutotune().delay(settings.getAutoDelay()), 
-        FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), 
-        "delay( %d )", settings.getAutoDelay())
-    );
+    idelay.addActionListener(e->{
+      String sdelay = JOptionPane.showInputDialog(EditorPanel.this, "Insert delay time in millis", settings.getAutoDelay());
+      try {
+        int delay = Integer.parseInt(sdelay);
+        addRecordAction(p->p.getAutotune().delay(delay), 
+            FontIcon.createIcon(FontAwesome.CLOCK_O, 14f), 
+            "delay( %d )", delay);
+      }
+      catch(Exception ex) {
+        JOptionPane.showMessageDialog(EditorPanel.this, ex.toString(), "Error! Bad delay!", JOptionPane.ERROR_MESSAGE);
+      }
+    });
     JMenuItem itype = new JMenuItem("Type Clipboard");
     itype.setIcon(FontIcon.createIcon(FontAwesome.KEYBOARD_O, 12f));
     itype.addActionListener(e->addRecordAction(
@@ -468,17 +478,6 @@ public class EditorPanel extends JPanel implements
     drawItem.setIcon(FontIcon.createIcon(FontAwesome.PAINT_BRUSH, Settings.GREEN_DARKEN3.color(), 12f));
     drawItem.addActionListener(e->toggleDrawSettings());
     
-    JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
-    ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));
-    ilsrec.addActionListener(e->dialogrecs.showDialog());
-    
-    JMenuItem iopenrecs = new JMenuItem("Open Record Script (Alt+O)");
-    iopenrecs.setIcon(FontIcon.createIcon(FontAwesome.FOLDER_OPEN_O, 12f));
-    iopenrecs.addActionListener(e->{
-      openRecordsAction.open(EditorPanel.this, recordActions);
-      dialogrecs.showDialog();
-    });
-    
     irecord.setIcon(FontIcon.createIcon(FontAwesome.CIRCLE_O, Color.BLACK, 12f));
     irecord.addActionListener(e->settings.setRecord(!settings.isRecord()));
     
@@ -497,6 +496,23 @@ public class EditorPanel extends JPanel implements
       updateAction.perform(this);
     });
     
+    JMenuItem itake = new JMenuItem("Take Screenshot (Alt+F8)");
+    itake.setIcon(FontIcon.createIcon(FontAwesome.PICTURE_O, 12f));
+    itake.addActionListener(e->{
+      new TakeScreenshotAction().accept(EditorPanel.this);
+    });
+    
+    JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
+    ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));
+    ilsrec.addActionListener(e->dialogrecs.showDialog());
+    
+    JMenuItem iopenrecs = new JMenuItem("Open Record Script (Alt+O)");
+    iopenrecs.setIcon(FontIcon.createIcon(FontAwesome.FOLDER_OPEN_O, 12f));
+    iopenrecs.addActionListener(e->{
+      openRecordsAction.open(EditorPanel.this, recordActions);
+      dialogrecs.showDialog();
+    });
+    
     JMenuItem iexit = new JMenuItem("Exit");
     iexit.setIcon(FontIcon.createIcon(FontAwesome.SIGN_OUT, 12f));
     iexit.addActionListener(e->System.exit(0));
@@ -512,6 +528,7 @@ public class EditorPanel extends JPanel implements
     menu.add(iupdate);
     menu.add(irev);
     menu.add(iplay);
+    menu.add(itake);
     menu.add(ilsrec);
     menu.add(iopenrecs);
     menu.add(new JPopupMenu.Separator());
