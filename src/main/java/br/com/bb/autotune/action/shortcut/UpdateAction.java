@@ -42,7 +42,7 @@ public class UpdateAction extends AbstractPanelAction {
     p.getRecordActions().stream()
         .skip(p.getActionIndex().get())
         .peek(a->p.getActionIndex().incrementAndGet())
-        .peek(a->p.getAutotune().delay(30))
+        .peek(a->p.getAutotune().delay(50))
         .forEach(a->a.accept(p));
     p.getAutotune().delay(200);
     p.getBackgroundImage().set(

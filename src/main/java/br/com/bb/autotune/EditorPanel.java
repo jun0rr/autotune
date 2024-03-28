@@ -30,6 +30,8 @@ import br.com.bb.autotune.action.shape.LineAction;
 import br.com.bb.autotune.action.shape.RectangleAction;
 import br.com.bb.autotune.action.shape.RectangleSelectionAction;
 import br.com.bb.autotune.action.shape.TriangleAction;
+import br.com.bb.autotune.action.shortcut.PlayAction;
+import br.com.bb.autotune.action.shortcut.RewindAction;
 import br.com.bb.autotune.action.shortcut.TakeScreenshotAction;
 import br.com.bb.autotune.action.text.AcuteAction;
 import br.com.bb.autotune.action.text.BackspaceAction;
@@ -191,6 +193,8 @@ public class EditorPanel extends JPanel implements
     this.panelActions.add(new ShowRecordListAction());
     this.panelActions.add(new ToggleRecordAction());
     this.panelActions.add(new TakeScreenshotAction());
+    this.panelActions.add(new RewindAction());
+    this.panelActions.add(new PlayAction());
     this.panelActions.add(updateAction);
     this.textActions = new ArrayList<>();
     this.textActions.add(new EnterAction());
@@ -487,20 +491,15 @@ public class EditorPanel extends JPanel implements
     
     JMenuItem irev = new JMenuItem("Rewind (Alt+F6)");
     irev.setIcon(FontIcon.createIcon(FontAwesome.BACKWARD, 12f));
-    irev.addActionListener(e->actionIndex.set(0));
+    irev.addActionListener(e->new RewindAction().perform(this));
     
     JMenuItem iplay = new JMenuItem("Play (Alt+F7)");
     iplay.setIcon(FontIcon.createIcon(FontAwesome.PLAY_CIRCLE, 12f));
-    iplay.addActionListener(e->{
-      actionIndex.set(0);
-      updateAction.perform(this);
-    });
+    iplay.addActionListener(e->new PlayAction().perform(this));
     
     JMenuItem itake = new JMenuItem("Take Screenshot (Alt+F8)");
     itake.setIcon(FontIcon.createIcon(FontAwesome.PICTURE_O, 12f));
-    itake.addActionListener(e->{
-      new TakeScreenshotAction().accept(EditorPanel.this);
-    });
+    itake.addActionListener(e->new TakeScreenshotAction().perform(this));
     
     JMenuItem ilsrec = new JMenuItem("Record List (Alt+L)");
     ilsrec.setIcon(FontIcon.createIcon(FontAwesome.BARS, 12f));

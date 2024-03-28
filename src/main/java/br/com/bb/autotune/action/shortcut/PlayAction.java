@@ -12,10 +12,10 @@ import java.awt.event.KeyEvent;
  *
  * @author Juno
  */
-public class TakeScreenshotAction extends AbstractPanelAction {
+public class PlayAction extends AbstractPanelAction {
   
-  public TakeScreenshotAction() {
-    super("TakeScreenshotAction");
+  public PlayAction() {
+    super("UpdateAction");
   }
   
   @Override
@@ -29,15 +29,22 @@ public class TakeScreenshotAction extends AbstractPanelAction {
         //p.getLastKeyEvents()[2]
     //);
     return p.getLastKeyEvents()[0] != null
-        && KeyEvent.VK_F8 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && KeyEvent.VK_F7 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
         && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditorPanel p) {
-    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F8);
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F7);
+    p.getActionIndex().set(0);
     p.getOwner().setVisible(false);
+    p.getAutotune().delay(200);
+    p.getRecordActions().stream()
+        .skip(p.getActionIndex().get())
+        .peek(a->p.getActionIndex().incrementAndGet())
+        .peek(a->p.getAutotune().delay(50))
+        .forEach(a->a.accept(p));
     p.getAutotune().delay(200);
     p.getBackgroundImage().set(
         p.getAutotune().takeScreenshot()

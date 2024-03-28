@@ -12,10 +12,10 @@ import java.awt.event.KeyEvent;
  *
  * @author Juno
  */
-public class TakeScreenshotAction extends AbstractPanelAction {
+public class RewindAction extends AbstractPanelAction {
   
-  public TakeScreenshotAction() {
-    super("TakeScreenshotAction");
+  public RewindAction() {
+    super("RewindAction");
   }
   
   @Override
@@ -29,20 +29,15 @@ public class TakeScreenshotAction extends AbstractPanelAction {
         //p.getLastKeyEvents()[2]
     //);
     return p.getLastKeyEvents()[0] != null
-        && KeyEvent.VK_F8 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
+        && KeyEvent.VK_F6 == p.getLastKeyEvents()[0].getExtendedKeyCode() 
         && p.getLastKeyEvents()[0].isAltDown()
         && KeyEvent.KEY_RELEASED == p.getLastKeyEvents()[0].getID();
   }
   
   @Override
   public void perform(EditorPanel p) {
-    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F8);
-    p.getOwner().setVisible(false);
-    p.getAutotune().delay(200);
-    p.getBackgroundImage().set(
-        p.getAutotune().takeScreenshot()
-    );
-    p.getOwner().setVisible(true);
+    removeShortcutRecords(p, KeyEvent.VK_ALT, KeyEvent.VK_F6);
+    p.getActionIndex().set(0);
   }
   
 }
